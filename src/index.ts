@@ -1,3 +1,4 @@
-import { Add } from './Add.js';
+import { PackedBoolFactory } from './packed-types/PackedBool';
+import { PackedUInt32Factory } from './packed-types/PackedUInt32';
 
-export { Add };
+export { PackedBoolFactory, PackedUInt32Factory };
