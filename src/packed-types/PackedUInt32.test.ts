@@ -64,7 +64,7 @@ describe('PackedUInt32', () => {
       );
     });
   });
-  it('Throws with invalid #check', () => {
+  it('Is one field in size', () => {
     const uints = [
       UInt32.from(67),
       UInt32.from(2n ** 32n - 1n),
@@ -72,19 +72,11 @@ describe('PackedUInt32', () => {
       UInt32.from(0),
       UInt32.from(128),
     ];
-    const PackedUInt32_2 = PackedUInt32Factory(2);
     const PackedUInt32_5 = PackedUInt32Factory(5);
-    const packedUInt32_5 = new PackedUInt32_5(
-      PackedUInt32_5.pack(uints),
-      uints
-    );
 
-    // Provable.runAndCheck(() => {
-    const packedUInt32_2 = new PackedUInt32_2(
-      PackedUInt32_5.pack(uints).add(5),
-      uints
-    );
-    PackedUInt32_5.check(packedUInt32_2);
-    // })
+    expect(PackedUInt32_5.sizeInFields()).toBe(1);
+    expect(
+      PackedUInt32_5.toFields({ packed: PackedUInt32_5.pack(uints) }).toString()
+    ).toBe([PackedUInt32_5.pack(uints)].toString());
   });
 });
