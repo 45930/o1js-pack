@@ -15,8 +15,8 @@ describe('PackedUInt32', () => {
 
     expect(unpacked[0].toBigint()).toBe(67n);
     expect(unpacked[1].toBigint()).toBe(2n ** 32n - 1n);
-    expect(unpacked[0].toBigint()).toBe(packedUInt32_2.uints[0].toBigint());
-    expect(unpacked[1].toBigint()).toBe(packedUInt32_2.uints[1].toBigint());
+    expect(unpacked[0].toBigint()).toBe(packedUInt32_2.aux[0].toBigint());
+    expect(unpacked[1].toBigint()).toBe(packedUInt32_2.aux[1].toBigint());
   });
   it('packs and unpacks 5 UInt32 values', async () => {
     const uints = [
@@ -41,11 +41,11 @@ describe('PackedUInt32', () => {
     expect(unpacked[3].toBigint()).toBe(0n);
     expect(unpacked[4].toBigint()).toBe(128n);
 
-    expect(unpacked[0].toBigint()).toBe(packedUInt32_5.uints[0].toBigint());
-    expect(unpacked[1].toBigint()).toBe(packedUInt32_5.uints[1].toBigint());
-    expect(unpacked[2].toBigint()).toBe(packedUInt32_5.uints[2].toBigint());
-    expect(unpacked[3].toBigint()).toBe(packedUInt32_5.uints[3].toBigint());
-    expect(unpacked[4].toBigint()).toBe(packedUInt32_5.uints[4].toBigint());
+    expect(unpacked[0].toBigint()).toBe(packedUInt32_5.aux[0].toBigint());
+    expect(unpacked[1].toBigint()).toBe(packedUInt32_5.aux[1].toBigint());
+    expect(unpacked[2].toBigint()).toBe(packedUInt32_5.aux[2].toBigint());
+    expect(unpacked[3].toBigint()).toBe(packedUInt32_5.aux[3].toBigint());
+    expect(unpacked[4].toBigint()).toBe(packedUInt32_5.aux[4].toBigint());
   });
   it('Validates with #check', () => {
     const uints = [

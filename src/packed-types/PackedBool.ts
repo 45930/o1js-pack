@@ -7,11 +7,11 @@ export function PackedBoolFactory(l: number) {
     static type = provable({ packed: Field }, {});
     static l: number = l;
     packed: Field;
-    bools: Bool[];
+    aux: Bool[];
 
-    constructor(packed: Field, bools: Bool[]) {
+    constructor(packed: Field, aux: Bool[]) {
       super({ packed });
-      this.bools = bools;
+      this.aux = aux;
     }
 
     /**
@@ -32,11 +32,11 @@ export function PackedBoolFactory(l: number) {
       return auxiliary;
     }
 
-    static pack(bools: Bool[]): Field {
+    static pack(aux: Bool[]): Field {
       let f = Field(0);
       for (let i = 0; i < l; i++) {
         const c = Field((2n ** 1n) ** BigInt(i));
-        f = f.add(bools[i].toField().mul(c));
+        f = f.add(aux[i].toField().mul(c));
       }
       return f;
     }

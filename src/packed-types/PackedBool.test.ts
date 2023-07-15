@@ -13,8 +13,8 @@ describe('PackedBool', () => {
 
     expect(unpacked[0].toBoolean()).toBe(false);
     expect(unpacked[1].toBoolean()).toBe(true);
-    expect(unpacked[0].toBoolean()).toBe(packedBool_2.bools[0].toBoolean());
-    expect(unpacked[1].toBoolean()).toBe(packedBool_2.bools[1].toBoolean());
+    expect(unpacked[0].toBoolean()).toBe(packedBool_2.aux[0].toBoolean());
+    expect(unpacked[1].toBoolean()).toBe(packedBool_2.aux[1].toBoolean());
   });
   it('packs and unpacks 50 Bool values', async () => {
     const myBooleans = [

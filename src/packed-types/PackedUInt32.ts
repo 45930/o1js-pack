@@ -7,11 +7,11 @@ export function PackedUInt32Factory(l: number) {
     static type = provable({ packed: Field }, {});
     static l: number = l;
     packed: Field;
-    uints: UInt32[];
+    aux: UInt32[];
 
-    constructor(packed: Field, uints: UInt32[]) {
+    constructor(packed: Field, aux: UInt32[]) {
       super({ packed });
-      this.uints = uints;
+      this.aux = aux;
     }
 
     /**
@@ -32,11 +32,11 @@ export function PackedUInt32Factory(l: number) {
       return auxiliary;
     }
 
-    static pack(uints: UInt32[]): Field {
+    static pack(aux: UInt32[]): Field {
       let f = Field(0);
       for (let i = 0; i < l; i++) {
         const c = Field((2n ** 32n) ** BigInt(i));
-        f = f.add(uints[i].value.mul(c));
+        f = f.add(aux[i].value.mul(c));
       }
       return f;
     }
