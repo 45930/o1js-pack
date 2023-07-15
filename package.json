@@ -2,7 +2,7 @@
   "name": "snarkyjs-pack",
   "version": "0.1.0",
   "description": "",
-  "author": "",
+  "author": "45930",
   "license": "Apache-2.0",
   "keywords": [
     "mina-zkapp",
@@ -45,8 +45,6 @@
     "typescript": "^4.7.2"
   },
   "peerDependencies": {
-    "snarkyjs": "0.11.*"
+    "snarkyjs": "^0.12.1"
   }
 }
-
-

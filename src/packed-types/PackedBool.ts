@@ -1,38 +1,61 @@
-import { Field, Provable, Struct, Bool } from 'snarkyjs';
+import { Field, Provable, Struct, Bool, provable } from 'snarkyjs';
 
 export function PackedBoolFactory(l: number) {
   class PackedBool_ extends Struct({
-    values: Provable.Array(Bool, l),
+    packed: Field,
   }) {
+    static type = provable({ packed: Field }, {});
     static l: number = l;
+    packed: Field;
+    aux: Bool[];
 
-    constructor(values: Bool[]) {
-      super({ values });
+    constructor(packed: Field, aux: Bool[]) {
+      super({ packed });
+      this.aux = aux;
     }
 
-    toFields(): Field[] {
-      let f = Field(0);
-      for (let i = 0; i < l; i++) {
-        const c = (2n ** 1n) ** BigInt(i);
-        if (this.values[i].toBoolean()) {
-          f = f.add(1n * c);
-        }
-      }
-      return [f];
-    }
-
-    static unpack(packed: Field): Bool[] {
-      const ret = Provable.witness(Provable.Array(Bool, l), () => {
-        let uints: bigint[] = [];
-        let packedN = packed.toBigInt();
+    /**
+     * Unpacks a Field into its component Bool parts
+     * @param value
+     * @returns the unpacked auxilliary data used to pack the value
+     */
+    static toAuxiliary(value?: { packed: Field } | undefined): Bool[] {
+      const auxiliary = Provable.witness(Provable.Array(Bool, l), () => {
+        let bools_: bigint[] = [];
+        let packedN = value?.packed.toBigInt() || 0n;
         for (let i = 0; i < l; i++) {
-          uints[i] = packedN & ((1n << 1n) - 1n);
+          bools_[i] = packedN & ((1n << 1n) - 1n);
           packedN >>= 1n;
         }
-        return uints.map((x) => Bool.fromJSON(Boolean(x)));
+        return bools_.map((x) => Bool.fromJSON(Boolean(x)));
       });
-      return ret;
+      return auxiliary;
     }
+
+    static pack(aux: Bool[]): Field {
+      let f = Field(0);
+      for (let i = 0; i < l; i++) {
+        const c = Field((2n ** 1n) ** BigInt(i));
+        f = f.add(aux[i].toField().mul(c));
+      }
+      return f;
+    }
+
+    static unpack(f: Field): Bool[] {
+      return this.toAuxiliary({ packed: f });
+    }
+
+    /**
+     * In-Circuit verifiaction of the packed Field
+     */
+    static check(value: { packed: Field }) {
+      const unpacked = this.toAuxiliary({ packed: value.packed });
+      const packed = this.pack(unpacked);
+      packed.assertEquals(value.packed);
+    }
+
+    // TODO
+    // static fromFields()
   }
   return PackedBool_;
 }
