@@ -110,4 +110,9 @@ describe('PackedBool', () => {
     // > console.log
     // > true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false
   });
+
+  it('throws for input >= 255 bools', () => {
+    expect(() => PackedBoolFactory(254)).not.toThrow();
+    expect(() => PackedBoolFactory(255)).toThrow();
+  });
 });

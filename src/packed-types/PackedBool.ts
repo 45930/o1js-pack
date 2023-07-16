@@ -1,19 +1,10 @@
-import { Field, Provable, Struct, Bool, provable } from 'snarkyjs';
+import { Field, Provable, Bool } from 'snarkyjs';
+import { PackingPlant } from './PackingPlant';
+
+const SIZE_IN_BITS = 1n;
 
 export function PackedBoolFactory(l: number) {
-  class PackedBool_ extends Struct({
-    packed: Field,
-  }) {
-    static type = provable({ packed: Field }, {});
-    static l: number = l;
-    packed: Field;
-    aux: Bool[];
-
-    constructor(packed: Field, aux: Bool[]) {
-      super({ packed });
-      this.aux = aux;
-    }
-
+  class PackedBool_ extends PackingPlant(Bool, l, SIZE_IN_BITS) {
     /**
      * Unpacks a Field into its component Bool parts
      * @param value
@@ -24,8 +15,8 @@ export function PackedBoolFactory(l: number) {
         let bools_: bigint[] = [];
         let packedN = value?.packed.toBigInt() || 0n;
         for (let i = 0; i < l; i++) {
-          bools_[i] = packedN & ((1n << 1n) - 1n);
-          packedN >>= 1n;
+          bools_[i] = packedN & ((1n << SIZE_IN_BITS) - 1n);
+          packedN >>= SIZE_IN_BITS;
         }
         return bools_.map((x) => Bool.fromJSON(Boolean(x)));
       });
@@ -35,27 +26,11 @@ export function PackedBoolFactory(l: number) {
     static pack(aux: Bool[]): Field {
       let f = Field(0);
       for (let i = 0; i < l; i++) {
-        const c = Field((2n ** 1n) ** BigInt(i));
+        const c = Field((2n ** SIZE_IN_BITS) ** BigInt(i));
         f = f.add(aux[i].toField().mul(c));
       }
       return f;
     }
-
-    static unpack(f: Field): Bool[] {
-      return this.toAuxiliary({ packed: f });
-    }
-
-    /**
-     * In-Circuit verifiaction of the packed Field
-     */
-    static check(value: { packed: Field }) {
-      const unpacked = this.toAuxiliary({ packed: value.packed });
-      const packed = this.pack(unpacked);
-      packed.assertEquals(value.packed);
-    }
-
-    // TODO
-    // static fromFields()
   }
   return PackedBool_;
 }
