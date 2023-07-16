@@ -79,4 +79,8 @@ describe('PackedUInt32', () => {
       PackedUInt32_5.toFields({ packed: PackedUInt32_5.pack(uints) }).toString()
     ).toBe([PackedUInt32_5.pack(uints)].toString());
   });
+  it('throws for input >= 8 uints', () => {
+    expect(() => PackedUInt32Factory(7)).not.toThrow();
+    expect(() => PackedUInt32Factory(8)).toThrow();
+  });
 });
