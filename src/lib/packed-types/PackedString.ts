@@ -1,11 +1,11 @@
 import { Field, Provable, Character } from 'snarkyjs';
-import { MultiPackingPlant, PackingPlant } from '../PackingPlant.js';
+import { MultiPackingPlant } from '../PackingPlant.js';
 
 const SIZE_IN_BITS = 16n;
 const CHARS_PER_FIELD = 15;
 
 export function PackedStringFactory(l: number) {
-  class PackedCharacter_ extends MultiPackingPlant(Character, l, SIZE_IN_BITS) {
+  class PackedString_ extends MultiPackingPlant(Character, l, SIZE_IN_BITS) {
     /**
      * Unpacks a Fields into its component Character parts
      * @param value
@@ -17,15 +17,20 @@ export function PackedStringFactory(l: number) {
       const auxiliary = Provable.witness(Provable.Array(Character, l), () => {
         let uints_ = new Array(l);
         uints_.fill(0n, 0, l);
-        console.log(uints_);
         let packedNs = new Array(this.n);
         packedNs.fill(0n);
+        const packedArg = new Array(this.n);
+        packedArg.fill(Field(0), 0, this.n);
         for (let i = 0; i < this.n; i++) {
-          if (value && value.packed[i] && value.packed[i].isConstant()) {
-            packedNs[i] = value.packed[i].toBigInt();
-          } else {
-            packedNs[i] = 0n;
+          if (value?.packed[i]) {
+            packedArg[i] = value?.packed[i];
           }
+        }
+        if (packedArg.length !== this.n) {
+          throw new Error(`Packed value must be exactly ${this.n} in length`);
+        }
+        for (let i = 0; i < this.n; i++) {
+          packedNs[i] = packedArg[i].toConstant().toBigInt();
         }
         for (let i = 0; i < packedNs.length; i++) {
           let packedN = packedNs[i];
@@ -35,7 +40,6 @@ export function PackedStringFactory(l: number) {
             packedN >>= SIZE_IN_BITS;
           }
         }
-        console.log(uints_);
         return uints_.map((x) =>
           Character.fromString(String.fromCharCode(Number(x)))
         );
@@ -53,12 +57,12 @@ export function PackedStringFactory(l: number) {
           const char = mutableAux.shift();
           const value = char?.value || Field(0);
           const c = Field((2n ** SIZE_IN_BITS) ** BigInt(i));
-          f = f.add(value.mul(c));
+          f = f.add(value.toConstant().mul(c));
         }
         fields.push(f);
       }
       return fields;
     }
   }
-  return PackedCharacter_;
+  return PackedString_;
 }

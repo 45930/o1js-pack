@@ -108,17 +108,13 @@ export function MultiPackingPlant<
     /**
      * In-Circuit verifiaction of the packed Field
      */
-    static check(value: { packed: Array<Field> }) {
-      const unpacked = this.toAuxiliary({ packed: value.packed });
-      const packed = this.pack(unpacked);
-      for (let i = 0; i < n; i++) {
-        if (value.packed[i].isConstant()) {
-          packed[i].assertEquals(value.packed[i]);
-        } else {
-          // probably should do something?
-        }
-      }
-    }
+    // static check(value: { packed: Array<Field> }) {
+    //   const unpacked = this.toAuxiliary({ packed: value.packed });
+    //   const packed = this.pack(unpacked);
+    //   for (let i = 0; i < n; i++) {
+    //     packed[i].assertEquals(value.packed[i]);
+    //   }
+    // }
   }
   return Packed_;
 }
