@@ -1,4 +1,4 @@
-import { Character } from 'snarkyjs';
+import { Character, Field } from 'snarkyjs';
 import { PackedStringFactory } from './PackedString';
 
 describe('PackedString', () => {
@@ -21,5 +21,15 @@ describe('PackedString', () => {
         .map((c) => c.toString())
         .join('')
     ).toBe(vitalik_dot_eth);
+  });
+  it('handles blank input', async () => {
+    const EthAddressString = PackedStringFactory(42);
+    const myEthAddress = new EthAddressString([Field(0)], []);
+
+    expect(() => {
+      EthAddressString.unpack(myEthAddress.packed)
+        .map((c) => c.toString())
+        .join('');
+    }).not.toThrow();
   });
 });

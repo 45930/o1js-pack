@@ -15,15 +15,25 @@ export function PackedStringFactory(l: number) {
       value?: { packed: Array<Field> } | undefined
     ): Character[] {
       const auxiliary = Provable.witness(Provable.Array(Character, l), () => {
-        let uints_: bigint[] = [];
-        const packedNs = value?.packed.map((f) => f.toBigInt()) || [0n];
+        let uints_ = new Array(l);
+        uints_.fill(0n, 0, l);
+        console.log(uints_);
+        const packedNs = value?.packed.map((f) => {
+          if (f.isConstant()) {
+            return f.toBigInt();
+          } else {
+            return 0n;
+          }
+        }) || [0n];
         for (let i = 0; i < packedNs.length; i++) {
           let packedN = packedNs[i];
           for (let j = 0; j < CHARS_PER_FIELD; j++) {
-            uints_.push(packedN & ((1n << SIZE_IN_BITS) - 1n));
+            const k = i * CHARS_PER_FIELD + j;
+            uints_[k] = packedN & ((1n << SIZE_IN_BITS) - 1n);
             packedN >>= SIZE_IN_BITS;
           }
         }
+        console.log(uints_);
         return uints_.map((x) =>
           Character.fromString(String.fromCharCode(Number(x)))
         );
