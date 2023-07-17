@@ -21,7 +21,7 @@ export function PackedStringFactory(l: number) {
         let packedNs = new Array(this.n);
         packedNs.fill(0n);
         for (let i = 0; i < this.n; i++) {
-          if (value && value.packed[i].isConstant()) {
+          if (value && value.packed[i] && value.packed[i].isConstant()) {
             packedNs[i] = value.packed[i].toBigInt();
           } else {
             packedNs[i] = 0n;
