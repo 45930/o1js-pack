@@ -1,5 +1,5 @@
 import { Field, Provable, UInt32 } from 'snarkyjs';
-import { PackingPlant } from './PackingPlant';
+import { PackingPlant } from '../PackingPlant';
 
 const SIZE_IN_BITS = 32n;
 
