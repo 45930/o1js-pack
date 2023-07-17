@@ -1,7 +1,7 @@
-import { PackedBoolFactory } from './packed-types/PackedBool';
-import { PackedCharacterFactory } from './packed-types/PackedCharacter';
-import { PackedUInt32Factory } from './packed-types/PackedUInt32';
-import { PackingPlant } from './packed-types/PackingPlant';
+import { PackedBoolFactory } from './lib/packed-types/PackedBool';
+import { PackedCharacterFactory } from './lib/packed-types/PackedCharacter';
+import { PackedUInt32Factory } from './lib/packed-types/PackedUInt32';
+import { PackingPlant } from './lib/PackingPlant';
 
 export {
   PackedBoolFactory,

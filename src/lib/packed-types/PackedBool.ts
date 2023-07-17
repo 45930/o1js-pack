@@ -1,5 +1,5 @@
 import { Field, Provable, Bool } from 'snarkyjs';
-import { PackingPlant } from './PackingPlant';
+import { PackingPlant } from '../PackingPlant';
 
 const SIZE_IN_BITS = 1n;
 
