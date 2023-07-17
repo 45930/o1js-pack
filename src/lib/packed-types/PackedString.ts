@@ -18,13 +18,15 @@ export function PackedStringFactory(l: number) {
         let uints_ = new Array(l);
         uints_.fill(0n, 0, l);
         console.log(uints_);
-        const packedNs = value?.packed.map((f) => {
-          if (f.isConstant()) {
-            return f.toBigInt();
+        let packedNs = new Array(this.n);
+        packedNs.fill(0n);
+        for (let i = 0; i < this.n; i++) {
+          if (value && value.packed[i].isConstant()) {
+            packedNs[i] = value.packed[i].toBigInt();
           } else {
-            return 0n;
+            packedNs[i] = 0n;
           }
-        }) || [0n];
+        }
         for (let i = 0; i < packedNs.length; i++) {
           let packedN = packedNs[i];
           for (let j = 0; j < CHARS_PER_FIELD; j++) {
