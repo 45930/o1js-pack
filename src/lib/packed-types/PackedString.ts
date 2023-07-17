@@ -55,9 +55,14 @@ export function PackedStringFactory(l: number) {
         const n = Math.min(mutableAux.length, CHARS_PER_FIELD);
         for (let i = 0; i < n; i++) {
           const char = mutableAux.shift();
-          const value = char?.value || Field(0);
+          if (!char) {
+            throw new Error('Unexpected Array Length');
+          }
+          const value = char.value || Field(0);
           const c = Field((2n ** SIZE_IN_BITS) ** BigInt(i));
-          f = f.add(value.toConstant().mul(c));
+          if (value.isConstant()) {
+            f = f.add(value.mul(c));
+          }
         }
         fields.push(f);
       }
