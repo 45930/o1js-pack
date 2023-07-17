@@ -1,4 +1,4 @@
-import { Character, Field } from 'snarkyjs';
+import { Character, Field, Provable } from 'snarkyjs';
 import { PackedStringFactory } from './PackedString';
 
 describe('PackedString', () => {
@@ -31,5 +31,27 @@ describe('PackedString', () => {
         .map((c) => c.toString())
         .join('');
     }).not.toThrow();
+  });
+  describe('in the circuit', () => {
+    it('works', () => {
+      expect(() => {
+        Provable.runAndCheck(() => {
+          const vitalik_dot_eth = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
+
+          let myCharacters = [];
+          for (let i = 0; i < vitalik_dot_eth.length; i++) {
+            myCharacters.push(Character.fromString(vitalik_dot_eth[i]));
+          }
+
+          const EthAddressString = PackedStringFactory(42);
+          const packed = EthAddressString.pack(myCharacters);
+          const myEthAddress = new EthAddressString(packed, myCharacters);
+
+          for (let i = 0; i < EthAddressString.n; i++) {
+            myEthAddress.packed[i].assertEquals(packed[i]);
+          }
+        });
+      }).not.toThrow();
+    });
   });
 });
