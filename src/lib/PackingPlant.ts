@@ -56,15 +56,6 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
     assertEquals(other: Packed_) {
       this.packed.assertEquals(other.packed);
     }
-
-    /**
-     * In-Circuit verifiaction of the packed Field
-     */
-    static check(value: { packed: Field }) {
-      const unpacked = this.toAuxiliary({ packed: value.packed });
-      const packed = this.pack(unpacked);
-      packed.assertEquals(value.packed);
-    }
   }
   return Packed_;
 }
@@ -93,6 +84,11 @@ export function MultiPackingPlant<
       if (aux.length > l) {
         throw new Error('Length of aux data is too long');
       }
+      if (aux.length < l) {
+        throw new Error(
+          'Length of aux data is too short - make sure to use fixed-size arrays'
+        );
+      }
       super({ packed });
       this.aux = aux;
     }
@@ -114,17 +110,6 @@ export function MultiPackingPlant<
 
     assertEquals(other: Packed_) {
       Poseidon.hash(this.packed).assertEquals(Poseidon.hash(other.packed));
-    }
-
-    /**
-     * In-Circuit verifiaction of the packed Field
-     */
-    static check(value: { packed: Array<Field> }) {
-      const unpacked = this.toAuxiliary({ packed: value.packed });
-      const packed = this.pack(unpacked);
-      for (let i = 0; i < n; i++) {
-        packed[i].assertEquals(value.packed[i]);
-      }
     }
   }
   return Packed_;

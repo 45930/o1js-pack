@@ -1,4 +1,4 @@
-import { Character, Provable } from 'snarkyjs';
+import { Character, Field, Provable } from 'snarkyjs';
 import { PackedStringFactory } from './PackedString';
 
 describe('PackedString', () => {
@@ -89,6 +89,22 @@ describe('PackedString', () => {
     });
 
     it('#assertEquals', () => {
+      expect(() => {
+        Provable.runAndCheck(() => {
+          const myEthAddress = new EthAddressString(
+            [Field(0), Field(0), Field(0)],
+            []
+          );
+
+          const myOtherEthAddress = new EthAddressString(
+            [Field(0), Field(0), Field(0)],
+            []
+          );
+
+          myEthAddress.assertEquals(myOtherEthAddress);
+        });
+      }).not.toThrow();
+
       expect(() => {
         Provable.runAndCheck(() => {
           const myEthAddress = new EthAddressString(
