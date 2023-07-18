@@ -84,11 +84,6 @@ export function MultiPackingPlant<
       if (aux.length > l) {
         throw new Error('Length of aux data is too long');
       }
-      if (aux.length < l) {
-        throw new Error(
-          'Length of aux data is too short - make sure to use fixed-size arrays'
-        );
-      }
       super({ packed });
       this.aux = aux;
     }

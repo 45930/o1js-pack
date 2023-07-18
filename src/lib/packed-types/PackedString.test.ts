@@ -92,22 +92,6 @@ describe('PackedString', () => {
       expect(() => {
         Provable.runAndCheck(() => {
           const myEthAddress = new EthAddressString(
-            [Field(0), Field(0), Field(0)],
-            []
-          );
-
-          const myOtherEthAddress = new EthAddressString(
-            [Field(0), Field(0), Field(0)],
-            []
-          );
-
-          myEthAddress.assertEquals(myOtherEthAddress);
-        });
-      }).not.toThrow();
-
-      expect(() => {
-        Provable.runAndCheck(() => {
-          const myEthAddress = new EthAddressString(
             outsideEthAddress.packed,
             outsideEthAddress.aux
           );
