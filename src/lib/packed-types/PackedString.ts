@@ -70,7 +70,7 @@ export function PackedStringFactory(l: number) {
 
     static fromString(str: string): PackedString_ {
       let characters = [];
-      for (let i = 0; i < this.l; i++) {
+      for (let i = 0; i < str.length; i++) {
         characters.push(Character.fromString(str[i]));
       }
 
