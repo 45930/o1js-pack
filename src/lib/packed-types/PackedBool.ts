@@ -5,15 +5,16 @@ const SIZE_IN_BITS = 1n;
 
 export function PackedBoolFactory(l: number) {
   class PackedBool_ extends PackingPlant(Bool, l, SIZE_IN_BITS) {
-    /**
-     * Unpacks a Field into its component Bool parts
-     * @param value
-     * @returns the unpacked auxilliary data used to pack the value
-     */
-    static toAuxiliary(value?: { packed: Field } | undefined): Bool[] {
+    static toAuxiliary(value?: { packed: Field } | undefined): Array<Bool> {
       const auxiliary = Provable.witness(Provable.Array(Bool, l), () => {
-        let bools_: bigint[] = [];
-        let packedN = value?.packed.toBigInt() || 0n;
+        let bools_ = new Array(l);
+        bools_.fill(0n);
+        let packedN;
+        if (value && value.packed) {
+          packedN = value.packed.toBigInt();
+        } else {
+          throw new Error('No Packed Value Provided');
+        }
         for (let i = 0; i < l; i++) {
           bools_[i] = packedN & ((1n << SIZE_IN_BITS) - 1n);
           packedN >>= SIZE_IN_BITS;
@@ -23,13 +24,27 @@ export function PackedBoolFactory(l: number) {
       return auxiliary;
     }
 
-    static pack(aux: Bool[]): Field {
-      let f = Field(0);
-      for (let i = 0; i < l; i++) {
+    static pack(aux: Array<Bool>): Field {
+      let f = aux[0].toField();
+      for (let i = 1; i < l; i++) {
         const c = Field((2n ** SIZE_IN_BITS) ** BigInt(i));
         f = f.add(aux[i].toField().mul(c));
       }
       return f;
+    }
+
+    static fromAuxiliary(aux: Array<Bool>): PackedBool_ {
+      const packed = PackedBool_.pack(aux);
+      return new PackedBool_(packed, aux);
+    }
+
+    static fromBooleans(bigints: Array<boolean>): PackedBool_ {
+      const uint32s = bigints.map((x) => Bool(x));
+      return this.fromAuxiliary(uint32s);
+    }
+
+    toBooleans(): Array<boolean> {
+      return PackedBool_.unpack(this.packed).map((x) => x.toBoolean());
     }
   }
   return PackedBool_;

@@ -1,4 +1,11 @@
-import { Field, Struct, provable, InferProvable, Provable } from 'snarkyjs';
+import {
+  Field,
+  Struct,
+  Poseidon,
+  provable,
+  InferProvable,
+  Provable,
+} from 'snarkyjs';
 
 const MAX_BITS_PER_FIELD = 254n;
 
@@ -22,16 +29,15 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
     bitSize: bigint = bitSize;
 
     constructor(packed: Field, aux: Array<T>) {
+      if (aux.length > l) {
+        throw new Error(
+          `Length of aux data is too long, input of size ${aux.length} is larger than max allowed ${l}`
+        );
+      }
       super({ packed });
       this.aux = aux;
     }
 
-    /**
-     * Unpacks a Field into its component parts
-     *
-     * @param value
-     * @returns the unpacked auxilliary data used to pack the value
-     */
     static toAuxiliary(value?: { packed: Field } | undefined): Array<T> {
       throw new Error('Must implement toAuxiliary');
       return [];
@@ -45,6 +51,10 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
 
     static unpack(f: Field) {
       return this.toAuxiliary({ packed: f });
+    }
+
+    assertEquals(other: Packed_) {
+      this.packed.assertEquals(other.packed);
     }
 
     /**
@@ -80,16 +90,13 @@ export function MultiPackingPlant<
     bitSize: bigint = bitSize;
 
     constructor(packed: Array<Field>, aux: Array<T>) {
+      if (aux.length > l) {
+        throw new Error('Length of aux data is too long');
+      }
       super({ packed });
       this.aux = aux;
     }
 
-    /**
-     * Unpacks a Field into its component parts
-     *
-     * @param value
-     * @returns the unpacked auxilliary data used to pack the value
-     */
     static toAuxiliary(value?: { packed: Array<Field> } | undefined): Array<T> {
       throw new Error('Must implement toAuxiliary');
       return [];
@@ -105,16 +112,20 @@ export function MultiPackingPlant<
       return this.toAuxiliary({ packed: fields });
     }
 
+    assertEquals(other: Packed_) {
+      Poseidon.hash(this.packed).assertEquals(Poseidon.hash(other.packed));
+    }
+
     /**
      * In-Circuit verifiaction of the packed Field
      */
-    // static check(value: { packed: Array<Field> }) {
-    //   const unpacked = this.toAuxiliary({ packed: value.packed });
-    //   const packed = this.pack(unpacked);
-    //   for (let i = 0; i < n; i++) {
-    //     packed[i].assertEquals(value.packed[i]);
-    //   }
-    // }
+    static check(value: { packed: Array<Field> }) {
+      const unpacked = this.toAuxiliary({ packed: value.packed });
+      const packed = this.pack(unpacked);
+      for (let i = 0; i < n; i++) {
+        packed[i].assertEquals(value.packed[i]);
+      }
+    }
   }
   return Packed_;
 }

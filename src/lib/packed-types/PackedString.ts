@@ -6,17 +6,12 @@ const CHARS_PER_FIELD = 15;
 
 export function PackedStringFactory(l: number) {
   class PackedString_ extends MultiPackingPlant(Character, l, SIZE_IN_BITS) {
-    /**
-     * Unpacks a Fields into its component Character parts
-     * @param value
-     * @returns the unpacked auxilliary data used to pack the value
-     */
     static toAuxiliary(
       value?: { packed: Array<Field> } | undefined
     ): Character[] {
       const auxiliary = Provable.witness(Provable.Array(Character, l), () => {
         let uints_ = new Array(l);
-        uints_.fill(0n, 0, l);
+        uints_.fill(0n);
         let packedNs = new Array(this.n);
         packedNs.fill(0n);
         const packedArg = new Array(this.n);
@@ -51,22 +46,47 @@ export function PackedStringFactory(l: number) {
       let fields = [];
       let mutableAux = [...aux];
       while (mutableAux.length > 0) {
-        let f = Field(0);
-        const n = Math.min(mutableAux.length, CHARS_PER_FIELD);
-        for (let i = 0; i < n; i++) {
+        const initialChar = mutableAux.shift();
+        if (!initialChar) {
+          throw new Error('Unexpected Array Length');
+        }
+        // f = initialChar.value is the same as f = 0; f += char.value * c^0;
+        // If f is initialized as 0, then it is a "constant" field and can't be added to a "variable" field in a proof
+        let f = initialChar.value;
+        const n = Math.min(mutableAux.length + 1, CHARS_PER_FIELD);
+        for (let i = 1; i < n; i++) {
           const char = mutableAux.shift();
           if (!char) {
             throw new Error('Unexpected Array Length');
           }
           const value = char.value || Field(0);
           const c = Field((2n ** SIZE_IN_BITS) ** BigInt(i));
-          if (value.isConstant()) {
-            f = f.add(value.mul(c));
-          }
+          f = f.add(value.mul(c));
         }
         fields.push(f);
       }
       return fields;
+    }
+
+    static fromString(str: string): PackedString_ {
+      let characters = [];
+      for (let i = 0; i < str.length; i++) {
+        characters.push(Character.fromString(str[i]));
+      }
+
+      return this.fromAuxiliary(characters);
+    }
+
+    static fromAuxiliary(aux: Array<Character>): PackedString_ {
+      const packed = this.pack(aux);
+      return new PackedString_(packed, aux);
+    }
+
+    toString() {
+      const nullChar = String.fromCharCode(0);
+      return PackedString_.unpack(this.packed)
+        .filter((c) => c.toString() !== nullChar)
+        .join('');
     }
   }
   return PackedString_;

@@ -1,118 +1,79 @@
-import { Bool } from 'snarkyjs';
+import { Bool, Provable } from 'snarkyjs';
 import { PackedBoolFactory } from './PackedBool';
 
 describe('PackedBool', () => {
-  it('packs and unpacks 2 Bool values', async () => {
-    const myBooleans = [false, true];
-    const myBools = myBooleans.map((b) => Bool(b));
-    const PackedBool_2 = PackedBoolFactory(2);
+  class PackedBool extends PackedBoolFactory(254) {}
+  const booleans = new Array(127).fill([true, false]).flat();
+  const bools = booleans.map((x) => Bool(x));
+  describe('Outside of the circuit', () => {
+    it('#fromBooleans', () => {
+      const myPackedBool = PackedBool.fromBooleans(booleans);
+      expect(myPackedBool.toBooleans()).toMatchObject(booleans);
+    });
 
-    const packedBool_2 = new PackedBool_2(PackedBool_2.pack(myBools), myBools);
-    const f = packedBool_2.packed;
-    const unpacked = PackedBool_2.unpack(f);
+    it('#pack and #unPack', () => {
+      const packed = PackedBool.pack(bools);
+      const unpacked = PackedBool.unpack(packed);
 
-    expect(unpacked[0].toBoolean()).toBe(false);
-    expect(unpacked[1].toBoolean()).toBe(true);
-    expect(unpacked[0].toBoolean()).toBe(packedBool_2.aux[0].toBoolean());
-    expect(unpacked[1].toBoolean()).toBe(packedBool_2.aux[1].toBoolean());
+      expect(unpacked.length).toBe(bools.length);
+      expect(unpacked).toMatchObject(bools);
+    });
   });
-  it('packs and unpacks 50 Bool values', async () => {
-    const myBooleans = [
-      true,
-      true,
-      false,
-      false,
-      true,
-      false,
-      true,
-      true,
-      true,
-      false,
-      true,
-      true,
-      false,
-      false,
-      true,
-      false,
-      true,
-      true,
-      true,
-      false,
-      true,
-      true,
-      false,
-      false,
-      true,
-      false,
-      true,
-      true,
-      true,
-      false,
-      true,
-      true,
-      false,
-      false,
-      true,
-      false,
-      true,
-      true,
-      true,
-      false,
-      true,
-      true,
-      false,
-      false,
-      true,
-      false,
-      true,
-      true,
-      true,
-      false,
-    ];
-    const myBools = myBooleans.map((b) => Bool(b));
-    const PackedBool_50 = PackedBoolFactory(50);
+  describe('Provable Properties', () => {
+    it('#sizeInFields', () => {
+      class one extends PackedBoolFactory(1) {}
+      class two_five_four extends PackedBoolFactory(254) {}
 
-    const packedBool_50 = new PackedBool_50(
-      PackedBool_50.pack(myBools),
-      myBools
-    );
-    const f = packedBool_50.packed;
-    const unpacked = PackedBool_50.unpack(f);
-
-    expect(unpacked[0].toBoolean()).toBe(myBooleans[0]);
-    expect(unpacked[1].toBoolean()).toBe(myBooleans[1]);
-    expect(unpacked[15].toBoolean()).toBe(myBooleans[15]);
-    expect(unpacked[20].toBoolean()).toBe(myBooleans[20]);
-    expect(unpacked[35].toBoolean()).toBe(myBooleans[35]);
-    expect(unpacked[49].toBoolean()).toBe(myBooleans[49]);
+      expect(one.sizeInFields()).toBe(1);
+      expect(two_five_four.sizeInFields()).toBe(1);
+    });
   });
-  it('mixes and matches class types', () => {
-    const myBooleans = [true, true, false, false, true, false];
-    const myBools = myBooleans.map((b) => Bool(b));
-    const PackedBool_2 = PackedBoolFactory(2);
-    const PackedBool_50 = PackedBoolFactory(50);
+  describe('Defensive Cases', () => {
+    it('throws for input >= 255 bools', () => {
+      expect(() => PackedBoolFactory(254)).not.toThrow();
+      expect(() => PackedBoolFactory(255)).toThrow();
+    });
 
-    const packedBool_2 = new PackedBool_2(PackedBool_2.pack(myBools), myBools);
-    const packedBool_50 = new PackedBool_50(
-      PackedBool_2.pack(myBools),
-      myBools
-    );
+    it('initalizes with more input than allowed', () => {
+      const tooMany = [...booleans].concat(false);
 
-    // TODO: Is this desired behavior?
-    console.log(
-      PackedBool_2.toAuxiliary({ packed: packedBool_2.packed }).toString()
-    );
-    // > console.log
-    // > true,true
-    console.log(
-      PackedBool_50.toAuxiliary({ packed: packedBool_50.packed }).toString()
-    );
-    // > console.log
-    // > true,true,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false
+      expect(() => {
+        PackedBool.fromBooleans(tooMany);
+      }).toThrow();
+    });
   });
+  describe('In the circuit', () => {
+    const outsidePackedBool = PackedBool.fromBooleans(booleans);
 
-  it('throws for input >= 255 bools', () => {
-    expect(() => PackedBoolFactory(254)).not.toThrow();
-    expect(() => PackedBoolFactory(255)).toThrow();
+    it('Initializes', () => {
+      expect(() => {
+        Provable.runAndCheck(() => {
+          const packedBool = new PackedBool(
+            outsidePackedBool.packed,
+            outsidePackedBool.aux
+          );
+
+          PackedBool.check({ packed: packedBool.packed });
+        });
+      }).not.toThrow();
+    });
+    it('#assertEquals', () => {
+      expect(() => {
+        Provable.runAndCheck(() => {
+          const packedBool = new PackedBool(
+            outsidePackedBool.packed,
+            outsidePackedBool.aux
+          );
+          packedBool.assertEquals(outsidePackedBool);
+        });
+      }).not.toThrow();
+      expect(() => {
+        Provable.runAndCheck(() => {
+          const fakePacked = outsidePackedBool.packed.add(32);
+          const packedBool = new PackedBool(fakePacked, outsidePackedBool.aux);
+          packedBool.assertEquals(outsidePackedBool);
+        });
+      }).toThrow();
+    });
   });
 });

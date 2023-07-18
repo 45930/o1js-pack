@@ -1,86 +1,93 @@
-import { Circuit, Field, Provable, Struct, UInt32 } from 'snarkyjs';
+import { Provable, UInt32 } from 'snarkyjs';
 import { PackedUInt32Factory } from './PackedUInt32';
 
 describe('PackedUInt32', () => {
-  it('packs and unpacks 2 UInt32 values', async () => {
-    const uints = [UInt32.from(67), UInt32.from(2n ** 32n - 1n)];
-    const PackedUInt32_2 = PackedUInt32Factory(2);
+  class PackedUInt32 extends PackedUInt32Factory(7) {}
+  describe('Outside of the circuit', () => {
+    const bigints = [10n, 2n ** 32n - 1n, 0n, 10n, 2n ** 32n - 100n, 42n, 0n];
+    const uints = bigints.map((x) => UInt32.from(x));
 
-    const packedUInt32_2 = new PackedUInt32_2(
-      PackedUInt32_2.pack(uints),
-      uints
-    );
-    const f = packedUInt32_2.packed;
-    const unpacked = PackedUInt32_2.unpack(f);
+    it('#fromBigInts', () => {
+      const myPackedUInt32 = PackedUInt32.fromBigInts(bigints);
+      expect(myPackedUInt32.toBigInts()).toMatchObject(bigints);
+    });
 
-    expect(unpacked[0].toBigint()).toBe(67n);
-    expect(unpacked[1].toBigint()).toBe(2n ** 32n - 1n);
-    expect(unpacked[0].toBigint()).toBe(packedUInt32_2.aux[0].toBigint());
-    expect(unpacked[1].toBigint()).toBe(packedUInt32_2.aux[1].toBigint());
-  });
-  it('packs and unpacks 5 UInt32 values', async () => {
-    const uints = [
-      UInt32.from(67),
-      UInt32.from(2n ** 32n - 1n),
-      UInt32.from(0),
-      UInt32.from(0),
-      UInt32.from(128),
-    ];
-    const PackedUInt32_5 = PackedUInt32Factory(5);
+    it('#pack and #unPack', () => {
+      const packed = PackedUInt32.pack(uints);
+      const unpacked = PackedUInt32.unpack(packed);
 
-    const packedUInt32_5 = new PackedUInt32_5(
-      PackedUInt32_5.pack(uints),
-      uints
-    );
-    const f = packedUInt32_5.packed;
-    const unpacked = PackedUInt32_5.unpack(f);
-
-    expect(unpacked[0].toBigint()).toBe(67n);
-    expect(unpacked[1].toBigint()).toBe(2n ** 32n - 1n);
-    expect(unpacked[2].toBigint()).toBe(0n);
-    expect(unpacked[3].toBigint()).toBe(0n);
-    expect(unpacked[4].toBigint()).toBe(128n);
-
-    expect(unpacked[0].toBigint()).toBe(packedUInt32_5.aux[0].toBigint());
-    expect(unpacked[1].toBigint()).toBe(packedUInt32_5.aux[1].toBigint());
-    expect(unpacked[2].toBigint()).toBe(packedUInt32_5.aux[2].toBigint());
-    expect(unpacked[3].toBigint()).toBe(packedUInt32_5.aux[3].toBigint());
-    expect(unpacked[4].toBigint()).toBe(packedUInt32_5.aux[4].toBigint());
-  });
-  it('Validates with #check', () => {
-    const uints = [
-      UInt32.from(67),
-      UInt32.from(2n ** 32n - 1n),
-      UInt32.from(0),
-      UInt32.from(0),
-      UInt32.from(128),
-    ];
-    const PackedUInt32_5 = PackedUInt32Factory(5);
-
-    Provable.runAndCheck(() => {
-      const packedUInt32_5 = new PackedUInt32_5(
-        PackedUInt32_5.pack(uints),
-        uints
-      );
+      expect(unpacked.length).toBe(uints.length);
+      expect(unpacked).toMatchObject(uints);
     });
   });
-  it('Is one field in size', () => {
-    const uints = [
-      UInt32.from(67),
-      UInt32.from(2n ** 32n - 1n),
-      UInt32.from(0),
-      UInt32.from(0),
-      UInt32.from(128),
-    ];
-    const PackedUInt32_5 = PackedUInt32Factory(5);
+  describe('Provable Properties', () => {
+    it('#sizeInFields', () => {
+      class one extends PackedUInt32Factory(1) {}
+      class seven extends PackedUInt32Factory(7) {}
 
-    expect(PackedUInt32_5.sizeInFields()).toBe(1);
-    expect(
-      PackedUInt32_5.toFields({ packed: PackedUInt32_5.pack(uints) }).toString()
-    ).toBe([PackedUInt32_5.pack(uints)].toString());
+      expect(one.sizeInFields()).toBe(1);
+      expect(seven.sizeInFields()).toBe(1);
+    });
   });
-  it('throws for input >= 8 uints', () => {
-    expect(() => PackedUInt32Factory(7)).not.toThrow();
-    expect(() => PackedUInt32Factory(8)).toThrow();
+  describe('Defensive Cases', () => {
+    it('throws for input >= 8 uints', () => {
+      expect(() => PackedUInt32Factory(7)).not.toThrow();
+      expect(() => PackedUInt32Factory(8)).toThrow();
+    });
+
+    it('initalizes with more input than allowed', () => {
+      const bigints = [
+        10n,
+        2n ** 32n - 1n,
+        0n,
+        10n,
+        2n ** 32n - 100n,
+        42n,
+        0n,
+        0n,
+      ];
+
+      expect(() => {
+        PackedUInt32.fromBigInts(bigints);
+      }).toThrow();
+    });
+  });
+  describe('In the circuit', () => {
+    const bigints = [10n, 2n ** 32n - 1n, 0n, 10n, 2n ** 32n - 100n, 42n, 0n];
+    const outsidePackedUInt = PackedUInt32.fromBigInts(bigints);
+
+    it('Initializes', () => {
+      expect(() => {
+        Provable.runAndCheck(() => {
+          const packedUInt32 = new PackedUInt32(
+            outsidePackedUInt.packed,
+            outsidePackedUInt.aux
+          );
+
+          PackedUInt32.check({ packed: packedUInt32.packed });
+        });
+      }).not.toThrow();
+    });
+    it('#assertEquals', () => {
+      expect(() => {
+        Provable.runAndCheck(() => {
+          const packedUInt32 = new PackedUInt32(
+            outsidePackedUInt.packed,
+            outsidePackedUInt.aux
+          );
+          packedUInt32.assertEquals(outsidePackedUInt);
+        });
+      }).not.toThrow();
+      expect(() => {
+        Provable.runAndCheck(() => {
+          const fakePacked = outsidePackedUInt.packed.add(32);
+          const packedUInt32 = new PackedUInt32(
+            fakePacked,
+            outsidePackedUInt.aux
+          );
+          packedUInt32.assertEquals(outsidePackedUInt);
+        });
+      }).toThrow();
+    });
   });
 });
