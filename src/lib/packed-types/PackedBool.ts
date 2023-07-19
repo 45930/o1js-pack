@@ -1,5 +1,5 @@
 import { Field, Provable, Bool } from 'snarkyjs';
-import { PackingPlant } from '../PackingPlant';
+import { PackingPlant } from '../PackingPlant.js';
 
 const SIZE_IN_BITS = 1n;
 
@@ -26,7 +26,8 @@ export function PackedBoolFactory(l: number) {
 
     static pack(aux: Array<Bool>): Field {
       let f = aux[0].toField();
-      for (let i = 1; i < l; i++) {
+      const n = Math.min(aux.length, l);
+      for (let i = 1; i < n; i++) {
         const c = Field((2n ** SIZE_IN_BITS) ** BigInt(i));
         f = f.add(aux[i].toField().mul(c));
       }

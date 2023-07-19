@@ -41,6 +41,17 @@ describe('PackedBool', () => {
         PackedBool.fromBooleans(tooMany);
       }).toThrow();
     });
+
+    it('initalizes with less input than specified', () => {
+      const booleans = [true, false];
+      const pad = new Array(252);
+      pad.fill(false);
+      const expected = booleans.concat(pad);
+
+      expect(PackedBool.fromBooleans(booleans).toBooleans()).toMatchObject(
+        expected
+      );
+    });
   });
   describe('In the circuit', () => {
     const outsidePackedBool = PackedBool.fromBooleans(booleans);
