@@ -1,5 +1,5 @@
 import { Field, Provable, UInt32 } from 'snarkyjs';
-import { PackingPlant } from '../PackingPlant';
+import { PackingPlant } from '../PackingPlant.js';
 
 const SIZE_IN_BITS = 32n;
 
@@ -26,7 +26,8 @@ export function PackedUInt32Factory(l: number) {
 
     static pack(aux: Array<UInt32>): Field {
       let f = aux[0].value;
-      for (let i = 1; i < l; i++) {
+      const n = Math.min(aux.length, l);
+      for (let i = 1; i < n; i++) {
         const c = Field((2n ** SIZE_IN_BITS) ** BigInt(i));
         f = f.add(aux[i].value.mul(c));
       }

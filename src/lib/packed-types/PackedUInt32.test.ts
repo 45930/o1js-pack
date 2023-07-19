@@ -51,6 +51,16 @@ describe('PackedUInt32', () => {
         PackedUInt32.fromBigInts(bigints);
       }).toThrow();
     });
+
+    it('initalizes with less input than specified', () => {
+      const bigints = [10n];
+
+      const expected = [10n, 0n, 0n, 0n, 0n, 0n, 0n];
+
+      expect(PackedUInt32.fromBigInts(bigints).toBigInts()).toMatchObject(
+        expected
+      );
+    });
   });
   describe('In the circuit', () => {
     const bigints = [10n, 2n ** 32n - 1n, 0n, 10n, 2n ** 32n - 100n, 42n, 0n];
