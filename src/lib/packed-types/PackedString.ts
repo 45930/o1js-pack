@@ -1,4 +1,4 @@
-import { Field, Provable, Character } from 'snarkyjs';
+import { Field, Provable, Character } from 'o1js';
 import { MultiPackingPlant } from '../PackingPlant.js';
 
 const SIZE_IN_BITS = 16n;

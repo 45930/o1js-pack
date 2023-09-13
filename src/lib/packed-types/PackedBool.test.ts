@@ -1,4 +1,4 @@
-import { Bool, Provable } from 'snarkyjs';
+import { Bool, Provable } from 'o1js';
 import { PackedBoolFactory } from './PackedBool';
 
 describe('PackedBool', () => {
