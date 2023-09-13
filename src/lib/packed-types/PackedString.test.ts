@@ -1,4 +1,4 @@
-import { Character, Field, Provable } from 'snarkyjs';
+import { Character, Field, Provable } from 'o1js';
 import { PackedStringFactory } from './PackedString';
 
 describe('PackedString', () => {
