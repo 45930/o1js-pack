@@ -55,6 +55,7 @@ describe('End to End Text Input Test', () => {
       const p1 = await TextInputProgram.changeFirstLetter(
         proofTextInput,
         initProof,
+        TextInput.unpack(new TextInput(initProof.publicInput.packed).packed),
         Character.fromString('Z')
       );
       Poseidon.hash(proofTextInput.packed).assertEquals(

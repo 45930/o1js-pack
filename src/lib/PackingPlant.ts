@@ -129,15 +129,6 @@ export function MultiPackingPlant<
       }
     }
 
-    // this.checkPack(unpacked);
-    // let f = this.extractField(unpacked[0])
-    // const n = Math.min(unpacked.length, l);
-    // for (let i = 1; i < n; i++) {
-    //   const c = Field((2n ** this.sizeInBits()) ** BigInt(i));
-    //   f = f.add(this.extractField(unpacked[i]).mul(c));
-    // }
-    // return f;
-
     static pack(unpacked: Array<T>): Array<Field> {
       this.checkPack(unpacked);
       let fields = [];

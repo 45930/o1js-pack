@@ -19,25 +19,30 @@ export const TextInputProgram = Experimental.ZkProgram({
       privateInputs: [],
       method(state: TextInput) {
         const initState = TextInput.fromString('Mina Protocol');
-        for (let x = 0; x < TextInput.n; x++) {
-          state.packed[x].assertEquals(initState.packed[x]);
-        }
+        state.assertEquals(initState);
       },
     },
     changeFirstLetter: {
-      privateInputs: [SelfProof, Character],
+      privateInputs: [
+        SelfProof,
+        Provable.Array(Character, MAX_LENGTH),
+        Character,
+      ],
       method(
         newState: TextInput,
         oldProof: SelfProof<TextInput, TextInput>,
+        oldCharacters: Array<Character>,
         newInput: Character
       ) {
         oldProof.verify();
-        let expectedUnpacked = TextInput.unpack(oldProof.publicInput.packed);
-        const repacked = TextInput.fromCharacters(expectedUnpacked);
-        repacked.assertEquals(oldProof.publicInput);
-        expectedUnpacked[0] = newInput;
-        const repacked2 = TextInput.fromCharacters(expectedUnpacked);
-        newState.assertEquals(repacked2);
+        const newCharacters = [
+          ...oldCharacters.map((x) => new Character(x.value)),
+        ];
+        const packed = TextInput.fromCharacters(oldCharacters);
+        packed.assertEquals(oldProof.publicInput);
+        newCharacters[0] = newInput;
+        const repacked = TextInput.fromCharacters(newCharacters);
+        newState.assertEquals(repacked);
       },
     },
   },

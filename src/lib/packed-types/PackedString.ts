@@ -35,9 +35,10 @@ export function PackedStringFactory(l: number = L) {
     }
 
     static fromString(str: string): PackedString_ {
-      let characters = [];
+      let characters: Array<Character> = new Array(l);
+      characters.fill(new Character(Field(0)), 0, l);
       for (let i = 0; i < str.length; i++) {
-        characters.push(Character.fromString(str[i]));
+        characters[i] = Character.fromString(str[i]);
       }
       return this.fromCharacters(characters);
     }
