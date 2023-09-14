@@ -42,6 +42,11 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
     }
     // End
 
+    /**
+     *
+     * @param unpacked Array of the implemented packed type
+     * @throws if the length of the array is longer than the length of the implementing factory config
+     */
     static checkPack(unpacked: Array<T>) {
       if (unpacked.length > l) {
         throw new Error(
@@ -50,6 +55,11 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
       }
     }
 
+    /**
+     *
+     * @param unpacked Array of the implemented packed type, must be shorter than the max allowed, which varies by type, will throw if the input is too long
+     * @returns Field, packed with the information from the unpacked input
+     */
     static pack(unpacked: Array<T>): Field {
       this.checkPack(unpacked);
       let f = this.extractField(unpacked[0]);
@@ -61,6 +71,11 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
       return f;
     }
 
+    /**
+     *
+     * @param f Field, packed with the information, as returned by #pack
+     * @returns Array of bigints, which can be decoded by the implementing class into the final type
+     */
     static unpackToBigints(f: Field): Array<bigint> {
       let unpacked = new Array(l);
       unpacked.fill(0n);
@@ -121,6 +136,11 @@ export function MultiPackingPlant<
     }
     // End
 
+    /**
+     *
+     * @param unpacked Array of the implemented packed type
+     * @throws if the length of the array is longer than the length of the implementing factory config
+     */
     static checkPack(unpacked: Array<T>) {
       if (unpacked.length > l) {
         throw new Error(
@@ -129,6 +149,14 @@ export function MultiPackingPlant<
       }
     }
 
+    /**
+     *
+     * @param unpacked Array of the implemented packed type, must be shorter than the max allowed, which varies by type, will throw if the input is too long
+     * @returns Array of Fields, packed such that each Field has as much information as possible
+     *
+     * e.g. 15 Characters pack into 1 Field.  15 or fewer Characters will return an array of 1 Field
+     *      30 of fewer Characters will return an aray of 2 Fields
+     */
     static pack(unpacked: Array<T>): Array<Field> {
       this.checkPack(unpacked);
       let fields = [];
@@ -155,6 +183,11 @@ export function MultiPackingPlant<
       return fields;
     }
 
+    /**
+     *
+     * @param fields Array of Fields, packed such that each Field has as much information as possible, as returned in #pack
+     * @returns Array of bigints, which can be decoded by the implementing class into the final type
+     */
     static unpackToBigints(fields: Array<Field>): Array<bigint> {
       let uints_ = new Array(l);
       uints_.fill(0n);

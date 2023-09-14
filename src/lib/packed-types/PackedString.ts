@@ -19,6 +19,11 @@ export function PackedStringFactory(l: number = L) {
       return CHARS_PER_FIELD;
     }
 
+    /**
+     *
+     * @param fields Array of Fields, containing packed Characters
+     * @returns Array of Character
+     */
     static unpack(fields: Field[]): Character[] {
       const unpacked = Provable.witness(Provable.Array(Character, l), () => {
         let unpacked = this.unpackToBigints(fields);
@@ -29,11 +34,21 @@ export function PackedStringFactory(l: number = L) {
       return unpacked;
     }
 
+    /**
+     *
+     * @param characters Array of Character to be packed
+     * @returns Instance of the implementing class
+     */
     static fromCharacters(characters: Array<Character>): PackedString_ {
       const packed = this.pack(characters);
       return new PackedString_(packed);
     }
 
+    /**
+     *
+     * @param str string to be packed
+     * @returns Instance of the implementing class
+     */
     static fromString(str: string): PackedString_ {
       let characters: Array<Character> = new Array(l);
       characters.fill(new Character(Field(0)), 0, l);

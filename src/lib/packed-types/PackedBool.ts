@@ -14,6 +14,11 @@ export function PackedBoolFactory(l: number = L) {
       return SIZE_IN_BITS;
     }
 
+    /**
+     *
+     * @param f Field, packed with the information, as returned by #pack
+     * @returns Array of Bool
+     */
     static unpack(f: Field): Bool[] {
       const unpacked = Provable.witness(Provable.Array(Bool, l), () => {
         const unpacked = this.unpackToBigints(f);
@@ -22,11 +27,21 @@ export function PackedBoolFactory(l: number = L) {
       return unpacked;
     }
 
+    /**
+     *
+     * @param bools Array of Bools to be packed
+     * @returns Instance of the implementing class
+     */
     static fromBools(bools: Array<Bool>): PackedBool_ {
       const packed = PackedBool_.pack(bools);
       return new PackedBool_(packed);
     }
 
+    /**
+     *
+     * @param booleans Array of booleans to be packed
+     * @returns Instance of the implementing class
+     */
     static fromBooleans(booleans: Array<boolean>): PackedBool_ {
       const bools = booleans.map((x) => Bool(x));
       return PackedBool_.fromBools(bools);

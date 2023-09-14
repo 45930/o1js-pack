@@ -14,6 +14,11 @@ export function PackedUInt32Factory(l: number = L) {
       return SIZE_IN_BITS;
     }
 
+    /**
+     *
+     * @param f Field, packed with the information, as returned by #pack
+     * @returns Array of UInt32
+     */
     static unpack(f: Field): UInt32[] {
       const unpacked = Provable.witness(Provable.Array(UInt32, l), () => {
         const unpacked = this.unpackToBigints(f);
@@ -22,11 +27,21 @@ export function PackedUInt32Factory(l: number = L) {
       return unpacked;
     }
 
+    /**
+     *
+     * @param uint32s Array of UInt32s to be packed
+     * @returns Instance of the implementing class
+     */
     static fromUInt32s(uint32s: Array<UInt32>): PackedUInt32_ {
       const packed = PackedUInt32_.pack(uint32s);
       return new PackedUInt32_(packed);
     }
 
+    /**
+     *
+     * @param bigints Array of bigints to be packed
+     * @returns Instance of the implementing class
+     */
     static fromBigInts(bigints: Array<bigint>): PackedUInt32_ {
       const uint32s = bigints.map((x) => UInt32.from(x));
       return PackedUInt32_.fromUInt32s(uint32s);
