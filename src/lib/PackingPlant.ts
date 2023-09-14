@@ -25,32 +25,22 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
     static type = provable({ packed: Field }, {});
     static l: number = l;
     packed: Field;
-    aux: Array<T>;
     bitSize: bigint = bitSize;
 
-    constructor(packed: Field, aux: Array<T>) {
-      if (aux.length > l) {
-        throw new Error(
-          `Length of aux data is too long, input of size ${aux.length} is larger than max allowed ${l}`
-        );
-      }
+    constructor(packed: Field) {
       super({ packed });
-      this.aux = aux;
     }
 
-    static toAuxiliary(value?: { packed: Field } | undefined): Array<T> {
-      throw new Error('Must implement toAuxiliary');
-      return [];
-    }
-
-    static pack(aux: Array<T>): Field {
+    static pack(unpacked: Array<T>): Field {
       throw new Error('Must implement pack');
       let f = Field(0);
       return f;
     }
 
     static unpack(f: Field) {
-      return this.toAuxiliary({ packed: f });
+      const unpacked = this.toAuxiliary({ packed: f });
+      f.assertEquals(this.pack(unpacked));
+      return unpacked;
     }
 
     assertEquals(other: Packed_) {
@@ -88,19 +78,14 @@ export function MultiPackingPlant<
       this.aux = aux;
     }
 
-    static toAuxiliary(value?: { packed: Array<Field> } | undefined): Array<T> {
-      throw new Error('Must implement toAuxiliary');
-      return [];
-    }
-
     static pack(aux: Array<T>): Array<Field> {
       throw new Error('Must implement pack');
       let f = [Field(0)];
       return f;
     }
 
-    static unpack(fields: Array<Field>) {
-      return this.toAuxiliary({ packed: fields });
+    static unpack(fields: Array<Field>): Array<T> {
+      throw new Error('Must implement pack');
     }
 
     assertEquals(other: Packed_) {

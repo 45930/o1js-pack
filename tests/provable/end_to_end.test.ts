@@ -19,8 +19,9 @@ describe('End to End Votes Test', () => {
     });
 
     it('Increments the 0th index', async () => {
+      initProof.verify();
       const proofAux = [1n, 0n];
-      const proofVotes = Votes.fromAuxiliary(Votes.fromBigInts(proofAux).aux);
+      const proofVotes = Votes.fromBigInts(proofAux);
       const proof = await VotesProgram.incrementIndex0(proofVotes, initProof);
       proof.verify();
       proofVotes.packed.assertEquals(proof.publicInput.packed);

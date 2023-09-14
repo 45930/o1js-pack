@@ -1,8 +1,7 @@
 import { Provable, UInt32 } from 'o1js';
-import { PackedUInt32Factory } from './PackedUInt32';
+import { PackedUInt32 } from './PackedUInt32';
 
 describe('PackedUInt32', () => {
-  class PackedUInt32 extends PackedUInt32Factory(7) {}
   describe('Outside of the circuit', () => {
     const bigints = [10n, 2n ** 32n - 1n, 0n, 10n, 2n ** 32n - 100n, 42n, 0n];
     const uints = bigints.map((x) => UInt32.from(x));
@@ -22,17 +21,13 @@ describe('PackedUInt32', () => {
   });
   describe('Provable Properties', () => {
     it('#sizeInFields', () => {
-      class one extends PackedUInt32Factory(1) {}
-      class seven extends PackedUInt32Factory(7) {}
-
-      expect(one.sizeInFields()).toBe(1);
-      expect(seven.sizeInFields()).toBe(1);
+      expect(PackedUInt32.sizeInFields()).toBe(1);
     });
   });
   describe('Defensive Cases', () => {
     it('throws for input >= 8 uints', () => {
-      expect(() => PackedUInt32Factory(7)).not.toThrow();
-      expect(() => PackedUInt32Factory(8)).toThrow();
+      expect(() => PackedUInt32).not.toThrow();
+      expect(() => PackedUInt32).toThrow();
     });
 
     it('initalizes with more input than allowed', () => {
@@ -69,10 +64,7 @@ describe('PackedUInt32', () => {
     it('Initializes', () => {
       expect(() => {
         Provable.runAndCheck(() => {
-          const packedUInt32 = new PackedUInt32(
-            outsidePackedUInt.packed,
-            outsidePackedUInt.aux
-          );
+          const packedUInt32 = new PackedUInt32(outsidePackedUInt.packed);
 
           PackedUInt32.check({ packed: packedUInt32.packed });
         });
@@ -81,20 +73,14 @@ describe('PackedUInt32', () => {
     it('#assertEquals', () => {
       expect(() => {
         Provable.runAndCheck(() => {
-          const packedUInt32 = new PackedUInt32(
-            outsidePackedUInt.packed,
-            outsidePackedUInt.aux
-          );
+          const packedUInt32 = new PackedUInt32(outsidePackedUInt.packed);
           packedUInt32.assertEquals(outsidePackedUInt);
         });
       }).not.toThrow();
       expect(() => {
         Provable.runAndCheck(() => {
           const fakePacked = outsidePackedUInt.packed.add(32);
-          const packedUInt32 = new PackedUInt32(
-            fakePacked,
-            outsidePackedUInt.aux
-          );
+          const packedUInt32 = new PackedUInt32(fakePacked);
           packedUInt32.assertEquals(outsidePackedUInt);
         });
       }).toThrow();

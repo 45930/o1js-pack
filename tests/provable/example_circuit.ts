@@ -1,7 +1,7 @@
 import { Experimental, SelfProof } from 'o1js';
-import { PackedUInt32Factory } from '../../src/lib/packed-types/PackedUInt32';
+import { PackedUInt32 } from '../../src/lib/packed-types/PackedUInt32';
 
-export class Votes extends PackedUInt32Factory(2) {}
+export class Votes extends PackedUInt32 {}
 
 export const VotesProgram = Experimental.ZkProgram({
   publicInput: Votes,
@@ -10,7 +10,7 @@ export const VotesProgram = Experimental.ZkProgram({
     init: {
       privateInputs: [],
       method(state: Votes) {
-        const initState = Votes.fromAuxiliary(Votes.fromBigInts([0n, 0n]).aux);
+        const initState = Votes.fromBigInts([0n, 0n]);
         state.assertEquals(initState);
       },
     },
@@ -19,19 +19,22 @@ export const VotesProgram = Experimental.ZkProgram({
       method(newState: Votes, oldProof: SelfProof<Votes, Votes>) {
         oldProof.verify();
         const expectedAux = Votes.unpack(oldProof.publicInput.packed);
+        oldProof.publicInput.packed.assertEquals(
+          Votes.fromUInt32s(expectedAux).packed
+        );
         expectedAux[0] = expectedAux[0].add(1);
-        newState.packed.assertEquals(Votes.fromAuxiliary(expectedAux).packed);
+        newState.packed.assertEquals(Votes.fromUInt32s(expectedAux).packed);
       },
     },
-    incrementIndex1: {
-      privateInputs: [SelfProof],
-      method(newState: Votes, oldProof: SelfProof<Votes, Votes>) {
-        oldProof.verify();
-        const expectedAux = Votes.unpack(oldProof.publicInput.packed);
-        expectedAux[1] = expectedAux[1].add(1);
-        newState.assertEquals(Votes.fromAuxiliary(expectedAux));
-      },
-    },
+    // incrementIndex1: {
+    //   privateInputs: [SelfProof],
+    //   method(newState: Votes, oldProof: SelfProof<Votes, Votes>) {
+    //     oldProof.verify();
+    //     const expectedAux = Votes.unpack(oldProof.publicInput.packed);
+    //     expectedAux[1] = expectedAux[1].add(1);
+    //     newState.packed.assertEquals(Votes.fromAuxiliary(expectedAux).packed);
+    //   },
+    // },
   },
 });
 

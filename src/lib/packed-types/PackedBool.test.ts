@@ -1,8 +1,7 @@
 import { Bool, Provable } from 'o1js';
-import { PackedBoolFactory } from './PackedBool';
+import { PackedBool } from './PackedBool';
 
 describe('PackedBool', () => {
-  class PackedBool extends PackedBoolFactory(254) {}
   const booleans = new Array(127).fill([true, false]).flat();
   const bools = booleans.map((x) => Bool(x));
   describe('Outside of the circuit', () => {
@@ -21,19 +20,10 @@ describe('PackedBool', () => {
   });
   describe('Provable Properties', () => {
     it('#sizeInFields', () => {
-      class one extends PackedBoolFactory(1) {}
-      class two_five_four extends PackedBoolFactory(254) {}
-
-      expect(one.sizeInFields()).toBe(1);
-      expect(two_five_four.sizeInFields()).toBe(1);
+      expect(PackedBool.sizeInFields()).toBe(1);
     });
   });
   describe('Defensive Cases', () => {
-    it('throws for input >= 255 bools', () => {
-      expect(() => PackedBoolFactory(254)).not.toThrow();
-      expect(() => PackedBoolFactory(255)).toThrow();
-    });
-
     it('initalizes with more input than allowed', () => {
       const tooMany = [...booleans].concat(false);
 
@@ -59,10 +49,7 @@ describe('PackedBool', () => {
     it('Initializes', () => {
       expect(() => {
         Provable.runAndCheck(() => {
-          const packedBool = new PackedBool(
-            outsidePackedBool.packed,
-            outsidePackedBool.aux
-          );
+          const packedBool = new PackedBool(outsidePackedBool.packed);
 
           PackedBool.check({ packed: packedBool.packed });
         });
@@ -71,17 +58,14 @@ describe('PackedBool', () => {
     it('#assertEquals', () => {
       expect(() => {
         Provable.runAndCheck(() => {
-          const packedBool = new PackedBool(
-            outsidePackedBool.packed,
-            outsidePackedBool.aux
-          );
+          const packedBool = new PackedBool(outsidePackedBool.packed);
           packedBool.assertEquals(outsidePackedBool);
         });
       }).not.toThrow();
       expect(() => {
         Provable.runAndCheck(() => {
           const fakePacked = outsidePackedBool.packed.add(32);
-          const packedBool = new PackedBool(fakePacked, outsidePackedBool.aux);
+          const packedBool = new PackedBool(fakePacked);
           packedBool.assertEquals(outsidePackedBool);
         });
       }).toThrow();
