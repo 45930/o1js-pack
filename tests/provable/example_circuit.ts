@@ -1,4 +1,4 @@
-import { Experimental, SelfProof } from 'snarkyjs';
+import { Experimental, SelfProof } from 'o1js';
 import { PackedUInt32Factory } from '../../src/lib/packed-types/PackedUInt32';
 
 export class Votes extends PackedUInt32Factory(2) {}

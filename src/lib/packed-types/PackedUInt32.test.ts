@@ -1,4 +1,4 @@
-import { Provable, UInt32 } from 'snarkyjs';
+import { Provable, UInt32 } from 'o1js';
 import { PackedUInt32Factory } from './PackedUInt32';
 
 describe('PackedUInt32', () => {

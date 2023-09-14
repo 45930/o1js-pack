@@ -1,4 +1,4 @@
-import { Field, Provable, Bool } from 'snarkyjs';
+import { Field, Provable, Bool } from 'o1js';
 import { PackingPlant } from '../PackingPlant.js';
 
 const SIZE_IN_BITS = 1n;

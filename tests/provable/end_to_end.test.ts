@@ -1,4 +1,4 @@
-import { UInt32 } from 'snarkyjs';
+import { UInt32 } from 'o1js';
 import { Votes, VotesProgram, VotesProof } from './example_circuit';
 
 describe('End to End Votes Test', () => {
