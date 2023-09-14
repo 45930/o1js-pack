@@ -1,9 +1,10 @@
 import { Bool, Provable } from 'o1js';
-import { PackedBool } from './PackedBool';
+import { PackedBoolFactory } from './PackedBool';
 
 describe('PackedBool', () => {
   const booleans = new Array(127).fill([true, false]).flat();
   const bools = booleans.map((x) => Bool(x));
+  class PackedBool extends PackedBoolFactory() {}
   describe('Outside of the circuit', () => {
     it('#fromBooleans', () => {
       const myPackedBool = PackedBool.fromBooleans(booleans);
@@ -20,7 +21,11 @@ describe('PackedBool', () => {
   });
   describe('Provable Properties', () => {
     it('#sizeInFields', () => {
-      expect(PackedBool.sizeInFields()).toBe(1);
+      class one extends PackedBoolFactory(1) {}
+      class two_five_four extends PackedBoolFactory(254) {}
+
+      expect(one.sizeInFields()).toBe(1);
+      expect(two_five_four.sizeInFields()).toBe(1);
     });
   });
   describe('Defensive Cases', () => {

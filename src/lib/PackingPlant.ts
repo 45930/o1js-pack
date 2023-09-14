@@ -24,22 +24,56 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
   }) {
     static type = provable({ packed: Field }, {});
     static l: number = l;
-    packed: Field;
     bitSize: bigint = bitSize;
 
     constructor(packed: Field) {
       super({ packed });
     }
 
+    // Must implement these in type-specific implementation
+    static extractField(input: T): Field {
+      throw new Error('Must implement extractField');
+    }
+    static sizeInBits(): bigint {
+      throw new Error('Must implement sizeInBits');
+    }
+    static unpack(f: Field): Array<T> {
+      throw new Error('Must implement unpack');
+    }
+    // End
+
+    static checkPack(unpacked: Array<T>) {
+      if (unpacked.length > l) {
+        throw new Error(
+          `Input of size ${unpacked.length} is larger than expected size of ${l}`
+        );
+      }
+    }
+
     static pack(unpacked: Array<T>): Field {
-      throw new Error('Must implement pack');
-      let f = Field(0);
+      this.checkPack(unpacked);
+      let f = this.extractField(unpacked[0]);
+      const n = Math.min(unpacked.length, l);
+      for (let i = 1; i < n; i++) {
+        const c = Field((2n ** this.sizeInBits()) ** BigInt(i));
+        f = f.add(this.extractField(unpacked[i]).mul(c));
+      }
       return f;
     }
 
-    static unpack(f: Field) {
-      const unpacked = this.toAuxiliary({ packed: f });
-      f.assertEquals(this.pack(unpacked));
+    static unpackToBigints(f: Field): Array<bigint> {
+      let unpacked = new Array(l);
+      unpacked.fill(0n);
+      let packedN;
+      if (f) {
+        packedN = f.toBigInt();
+      } else {
+        throw new Error('No Packed Value Provided');
+      }
+      for (let i = 0; i < l; i++) {
+        unpacked[i] = packedN & ((1n << this.sizeInBits()) - 1n);
+        packedN >>= this.sizeInBits();
+      }
       return unpacked;
     }
 
@@ -66,30 +100,103 @@ export function MultiPackingPlant<
     static type = provable({ packed: Provable.Array(Field, n) }, {});
     static l: number = l;
     static n: number = n;
-    packed: Array<Field>;
-    aux: Array<T>;
     bitSize: bigint = bitSize;
 
-    constructor(packed: Array<Field>, aux: Array<T>) {
-      if (aux.length > l) {
-        throw new Error('Length of aux data is too long');
-      }
+    constructor(packed: Array<Field>) {
       super({ packed });
-      this.aux = aux;
     }
 
-    static pack(aux: Array<T>): Array<Field> {
-      throw new Error('Must implement pack');
-      let f = [Field(0)];
-      return f;
+    // Must implement these in type-specific implementation
+    static extractField(input: T | undefined): Field {
+      throw new Error('Must implement extractField');
     }
-
+    static sizeInBits(): bigint {
+      throw new Error('Must implement sizeInBits');
+    }
+    static elementsPerField(): number {
+      throw new Error('Must implement elementsPerField');
+    }
     static unpack(fields: Array<Field>): Array<T> {
-      throw new Error('Must implement pack');
+      throw new Error('Must implement unpack');
+    }
+    // End
+
+    static checkPack(unpacked: Array<T>) {
+      if (unpacked.length > l) {
+        throw new Error(
+          `Input of size ${unpacked.length} is larger than expected size of ${l}`
+        );
+      }
+    }
+
+    // this.checkPack(unpacked);
+    // let f = this.extractField(unpacked[0])
+    // const n = Math.min(unpacked.length, l);
+    // for (let i = 1; i < n; i++) {
+    //   const c = Field((2n ** this.sizeInBits()) ** BigInt(i));
+    //   f = f.add(this.extractField(unpacked[i]).mul(c));
+    // }
+    // return f;
+
+    static pack(unpacked: Array<T>): Array<Field> {
+      this.checkPack(unpacked);
+      let fields = [];
+      let mutableUnpacked = [...unpacked];
+      while (mutableUnpacked.length > 0) {
+        let f = this.extractField(mutableUnpacked.shift());
+        if (!f) {
+          throw new Error('Unexpected Array Length');
+        }
+        // f = f.value is the same as f = 0; f += char.value * c^0;
+        // If f is initialized as 0, then it is a "constant" field and can't be added to a "variable" field in a proof
+        const n = Math.min(mutableUnpacked.length + 1, this.elementsPerField());
+        for (let i = 1; i < n; i++) {
+          let value = this.extractField(mutableUnpacked.shift());
+          if (!value) {
+            throw new Error('Unexpected Array Length');
+          }
+          value = value || Field(0);
+          const c = Field((2n ** this.sizeInBits()) ** BigInt(i));
+          f = f.add(value.mul(c));
+        }
+        fields.push(f);
+      }
+      return fields;
+    }
+
+    static unpackToBigints(fields: Array<Field>): Array<bigint> {
+      let uints_ = new Array(l);
+      uints_.fill(0n);
+      let packedNs = new Array(this.n);
+      packedNs.fill(0n);
+      const packedArg = new Array(this.n);
+      packedArg.fill(Field(0), 0, this.n);
+      for (let i = 0; i < this.n; i++) {
+        if (fields[i]) {
+          packedArg[i] = fields[i];
+        }
+      }
+      if (packedArg.length !== this.n) {
+        throw new Error(`Packed value must be exactly ${this.n} in length`);
+      }
+      for (let i = 0; i < this.n; i++) {
+        packedNs[i] = packedArg[i].toConstant().toBigInt();
+      }
+      for (let i = 0; i < packedNs.length; i++) {
+        let packedN = packedNs[i];
+        for (let j = 0; j < this.elementsPerField(); j++) {
+          const k = i * this.elementsPerField() + j;
+          uints_[k] = packedN & ((1n << this.sizeInBits()) - 1n);
+          packedN >>= this.sizeInBits();
+        }
+      }
+      return uints_;
     }
 
     assertEquals(other: Packed_) {
-      Poseidon.hash(this.packed).assertEquals(Poseidon.hash(other.packed));
+      for (let x = 0; x < n; x++) {
+        this.packed[x].assertEquals(other.packed[x]);
+      }
     }
   }
   return Packed_;
