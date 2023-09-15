@@ -29,6 +29,10 @@ describe('PackedBool', () => {
     });
   });
   describe('Defensive Cases', () => {
+    it('throws for input >= 255 bools', () => {
+      expect(() => PackedBoolFactory(254)).not.toThrow();
+      expect(() => PackedBoolFactory(255)).toThrow();
+    });
     it('initalizes with more input than allowed', () => {
       const tooMany = [...booleans].concat(false);
 

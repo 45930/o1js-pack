@@ -1,7 +1,7 @@
 import { Field, Provable, Bool } from 'o1js';
 import { PackingPlant } from '../PackingPlant.js';
 
-const L = 254; // 254 1-byte uints fit in one Field
+const L = 254; // 254 1-bit booleans fit in one Field
 const SIZE_IN_BITS = 1n;
 
 export function PackedBoolFactory(l: number = L) {

@@ -1,7 +1,7 @@
 import { Field, Provable, UInt32 } from 'o1js';
 import { PackingPlant } from '../PackingPlant.js';
 
-const L = 7; // 7 32-byte uints fit in one Field
+const L = 7; // 7 32-bit uints fit in one Field
 const SIZE_IN_BITS = 32n;
 
 export function PackedUInt32Factory(l: number = L) {
