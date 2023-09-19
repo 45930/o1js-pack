@@ -4,7 +4,7 @@ Make the most of your zkApp state!
 
 ## What is it
 
-o1js Pack is a library for [O1JS](https://github.com/o1-labs/o1js/) that allows a zkApp developer to pack extra data into a single Field.
+o1js Pack is a library for [o1js](https://github.com/o1-labs/o1js/) that allows a zkApp developer to pack extra data into a single Field.
 
 ### Usage in a zkApp
 
