@@ -1,47 +1,50 @@
 import { Field, Provable, Bool } from 'o1js';
 import { PackingPlant } from '../PackingPlant.js';
 
+const L = 254; // 254 1-bit booleans fit in one Field
 const SIZE_IN_BITS = 1n;
 
-export function PackedBoolFactory(l: number) {
+export function PackedBoolFactory(l: number = L) {
   class PackedBool_ extends PackingPlant(Bool, l, SIZE_IN_BITS) {
-    static toAuxiliary(value?: { packed: Field } | undefined): Array<Bool> {
-      const auxiliary = Provable.witness(Provable.Array(Bool, l), () => {
-        let bools_ = new Array(l);
-        bools_.fill(0n);
-        let packedN;
-        if (value && value.packed) {
-          packedN = value.packed.toBigInt();
-        } else {
-          throw new Error('No Packed Value Provided');
-        }
-        for (let i = 0; i < l; i++) {
-          bools_[i] = packedN & ((1n << SIZE_IN_BITS) - 1n);
-          packedN >>= SIZE_IN_BITS;
-        }
-        return bools_.map((x) => Bool.fromJSON(Boolean(x)));
+    static extractField(input: Bool): Field {
+      return input.toField();
+    }
+
+    static sizeInBits(): bigint {
+      return SIZE_IN_BITS;
+    }
+
+    /**
+     *
+     * @param f Field, packed with the information, as returned by #pack
+     * @returns Array of Bool
+     */
+    static unpack(f: Field): Bool[] {
+      const unpacked = Provable.witness(Provable.Array(Bool, l), () => {
+        const unpacked = this.unpackToBigints(f);
+        return unpacked.map((x) => Bool.fromJSON(Boolean(x)));
       });
-      return auxiliary;
+      return unpacked;
     }
 
-    static pack(aux: Array<Bool>): Field {
-      let f = aux[0].toField();
-      const n = Math.min(aux.length, l);
-      for (let i = 1; i < n; i++) {
-        const c = Field((2n ** SIZE_IN_BITS) ** BigInt(i));
-        f = f.add(aux[i].toField().mul(c));
-      }
-      return f;
+    /**
+     *
+     * @param bools Array of Bools to be packed
+     * @returns Instance of the implementing class
+     */
+    static fromBools(bools: Array<Bool>): PackedBool_ {
+      const packed = PackedBool_.pack(bools);
+      return new PackedBool_(packed);
     }
 
-    static fromAuxiliary(aux: Array<Bool>): PackedBool_ {
-      const packed = PackedBool_.pack(aux);
-      return new PackedBool_(packed, aux);
-    }
-
-    static fromBooleans(bigints: Array<boolean>): PackedBool_ {
-      const uint32s = bigints.map((x) => Bool(x));
-      return this.fromAuxiliary(uint32s);
+    /**
+     *
+     * @param booleans Array of booleans to be packed
+     * @returns Instance of the implementing class
+     */
+    static fromBooleans(booleans: Array<boolean>): PackedBool_ {
+      const bools = booleans.map((x) => Bool(x));
+      return PackedBool_.fromBools(bools);
     }
 
     toBooleans(): Array<boolean> {

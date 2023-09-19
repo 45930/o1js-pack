@@ -20,7 +20,7 @@ describe('PackedString', () => {
     });
 
     it('#fromAuxilliary', () => {
-      const myEthAddress = EthAddressString.fromAuxiliary(characters);
+      const myEthAddress = EthAddressString.fromCharacters(characters);
       expect(myEthAddress.toString()).toBe(vitalik_dot_eth);
     });
 
@@ -58,7 +58,7 @@ describe('PackedString', () => {
       class String10 extends PackedStringFactory(10) {}
 
       expect(() => {
-        const string11 = String10.fromString('abcdefghijk');
+        String10.fromString('abcdefghijk');
       }).toThrow();
     });
     it('Exceeds maximum size string', () => {
@@ -78,10 +78,7 @@ describe('PackedString', () => {
     it('Initializes a string', () => {
       expect(() => {
         Provable.runAndCheck(() => {
-          const myEthAddress = new EthAddressString(
-            outsideEthAddress.packed,
-            outsideEthAddress.aux
-          );
+          const myEthAddress = new EthAddressString(outsideEthAddress.packed);
 
           EthAddressString.check({ packed: myEthAddress.packed });
         });
@@ -91,10 +88,7 @@ describe('PackedString', () => {
     it('#assertEquals', () => {
       expect(() => {
         Provable.runAndCheck(() => {
-          const myEthAddress = new EthAddressString(
-            outsideEthAddress.packed,
-            outsideEthAddress.aux
-          );
+          const myEthAddress = new EthAddressString(outsideEthAddress.packed);
 
           myEthAddress.assertEquals(outsideEthAddress);
         });
@@ -104,10 +98,7 @@ describe('PackedString', () => {
         Provable.runAndCheck(() => {
           const fakePacked = [...outsideEthAddress.packed];
           fakePacked[0] = fakePacked[0].add(1);
-          const myEthAddress = new EthAddressString(
-            fakePacked,
-            outsideEthAddress.aux
-          );
+          const myEthAddress = new EthAddressString(fakePacked);
 
           myEthAddress.assertEquals(outsideEthAddress);
         });

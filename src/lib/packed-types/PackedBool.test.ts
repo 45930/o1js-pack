@@ -2,9 +2,9 @@ import { Bool, Provable } from 'o1js';
 import { PackedBoolFactory } from './PackedBool';
 
 describe('PackedBool', () => {
-  class PackedBool extends PackedBoolFactory(254) {}
   const booleans = new Array(127).fill([true, false]).flat();
   const bools = booleans.map((x) => Bool(x));
+  class PackedBool extends PackedBoolFactory() {}
   describe('Outside of the circuit', () => {
     it('#fromBooleans', () => {
       const myPackedBool = PackedBool.fromBooleans(booleans);
@@ -33,7 +33,6 @@ describe('PackedBool', () => {
       expect(() => PackedBoolFactory(254)).not.toThrow();
       expect(() => PackedBoolFactory(255)).toThrow();
     });
-
     it('initalizes with more input than allowed', () => {
       const tooMany = [...booleans].concat(false);
 
@@ -59,10 +58,7 @@ describe('PackedBool', () => {
     it('Initializes', () => {
       expect(() => {
         Provable.runAndCheck(() => {
-          const packedBool = new PackedBool(
-            outsidePackedBool.packed,
-            outsidePackedBool.aux
-          );
+          const packedBool = new PackedBool(outsidePackedBool.packed);
 
           PackedBool.check({ packed: packedBool.packed });
         });
@@ -71,17 +67,14 @@ describe('PackedBool', () => {
     it('#assertEquals', () => {
       expect(() => {
         Provable.runAndCheck(() => {
-          const packedBool = new PackedBool(
-            outsidePackedBool.packed,
-            outsidePackedBool.aux
-          );
+          const packedBool = new PackedBool(outsidePackedBool.packed);
           packedBool.assertEquals(outsidePackedBool);
         });
       }).not.toThrow();
       expect(() => {
         Provable.runAndCheck(() => {
           const fakePacked = outsidePackedBool.packed.add(32);
-          const packedBool = new PackedBool(fakePacked, outsidePackedBool.aux);
+          const packedBool = new PackedBool(fakePacked);
           packedBool.assertEquals(outsidePackedBool);
         });
       }).toThrow();
