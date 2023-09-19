@@ -19,7 +19,7 @@ describe('PackedString', () => {
       expect(myEthAddress.toString()).toBe(vitalik_dot_eth);
     });
 
-    it('#fromAuxilliary', () => {
+    it('#fromCharacters', () => {
       const myEthAddress = EthAddressString.fromCharacters(characters);
       expect(myEthAddress.toString()).toBe(vitalik_dot_eth);
     });
