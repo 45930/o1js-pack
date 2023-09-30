@@ -24,6 +24,7 @@ export function PackedBoolFactory(l: number = L) {
         const unpacked = this.unpackToBigints(f);
         return unpacked.map((x) => Bool.fromJSON(Boolean(x)));
       });
+      f.assertEquals(PackedBool_.pack(unpacked));
       return unpacked;
     }
 

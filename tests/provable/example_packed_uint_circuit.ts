@@ -18,24 +18,18 @@ export const VotesProgram = Experimental.ZkProgram({
       privateInputs: [SelfProof],
       method(newState: Votes, oldProof: SelfProof<Votes, Votes>) {
         oldProof.verify();
-        const expectedUnpacked = Votes.unpack(oldProof.publicInput.packed);
-        oldProof.publicInput.packed.assertEquals(
-          Votes.fromUInt32s(expectedUnpacked).packed
-        );
-        expectedUnpacked[0] = expectedUnpacked[0].add(1);
-        newState.assertEquals(Votes.fromUInt32s(expectedUnpacked));
+        const unpacked = Votes.unpack(oldProof.publicInput.packed);
+        unpacked[0] = unpacked[0].add(1);
+        newState.assertEquals(Votes.fromUInt32s(unpacked));
       },
     },
     incrementIndex1: {
       privateInputs: [SelfProof],
       method(newState: Votes, oldProof: SelfProof<Votes, Votes>) {
         oldProof.verify();
-        const expectedUnpacked = Votes.unpack(oldProof.publicInput.packed);
-        oldProof.publicInput.packed.assertEquals(
-          Votes.fromUInt32s(expectedUnpacked).packed
-        );
-        expectedUnpacked[1] = expectedUnpacked[1].add(1);
-        newState.assertEquals(Votes.fromUInt32s(expectedUnpacked));
+        const unpacked = Votes.unpack(oldProof.publicInput.packed);
+        unpacked[1] = unpacked[1].add(1);
+        newState.assertEquals(Votes.fromUInt32s(unpacked));
       },
     },
   },

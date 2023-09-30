@@ -1,4 +1,4 @@
-import { Field, Provable, Character } from 'o1js';
+import { Field, Provable, Character, Poseidon } from 'o1js';
 import { MultiPackingPlant } from '../PackingPlant.js';
 
 const SIZE_IN_BITS = 16n;
@@ -31,6 +31,9 @@ export function PackedStringFactory(l: number = L) {
           Character.fromString(String.fromCharCode(Number(x)))
         );
       });
+      Poseidon.hash(fields).assertEquals(
+        Poseidon.hash(PackedString_.pack(unpacked))
+      );
       return unpacked;
     }
 

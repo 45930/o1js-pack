@@ -24,6 +24,7 @@ export function PackedUInt32Factory(l: number = L) {
         const unpacked = this.unpackToBigints(f);
         return unpacked.map((x) => UInt32.from(x));
       });
+      f.assertEquals(PackedUInt32_.pack(unpacked));
       return unpacked;
     }
 
