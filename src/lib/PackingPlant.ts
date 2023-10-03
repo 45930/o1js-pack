@@ -24,7 +24,7 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
   }) {
     static type = provable({ packed: Field }, {});
     static l: number = l;
-    bitSize: bigint = bitSize;
+    static bitSize: bigint = bitSize;
 
     constructor(packed: Field) {
       super({ packed });
@@ -115,7 +115,7 @@ export function MultiPackingPlant<
     static type = provable({ packed: Provable.Array(Field, n) }, {});
     static l: number = l;
     static n: number = n;
-    bitSize: bigint = bitSize;
+    static bitSize: bigint = bitSize;
 
     constructor(packed: Array<Field>) {
       super({ packed });
@@ -142,7 +142,8 @@ export function MultiPackingPlant<
      * @throws if the length of the array is longer than the length of the implementing factory config
      */
     static checkPack(unpacked: Array<T>) {
-      if (unpacked.length > l) {
+      const q = this.elementsPerField();
+      if (unpacked.length > q * this.n) {
         throw new Error(
           `Input of size ${unpacked.length} is larger than expected size of ${l}`
         );
@@ -159,23 +160,22 @@ export function MultiPackingPlant<
      */
     static pack(unpacked: Array<T>): Array<Field> {
       this.checkPack(unpacked);
+      const q = this.elementsPerField();
       let fields = [];
       let mutableUnpacked = [...unpacked];
-      while (mutableUnpacked.length > 0) {
-        let f = this.extractField(mutableUnpacked.shift());
+      for (let i = 0; i < this.n; i++) {
+        let f = this.extractField(mutableUnpacked[i * q]);
         if (!f) {
           throw new Error('Unexpected Array Length');
         }
-        // f = f.value is the same as f = 0; f += char.value * c^0;
-        // If f is initialized as 0, then it is a "constant" field and can't be added to a "variable" field in a proof
-        const n = Math.min(mutableUnpacked.length + 1, this.elementsPerField());
-        for (let i = 1; i < n; i++) {
-          let value = this.extractField(mutableUnpacked.shift());
+        for (let j = 1; j < q; j++) {
+          const idx = i * q + j;
+          let value = this.extractField(mutableUnpacked[idx]);
           if (!value) {
             throw new Error('Unexpected Array Length');
           }
           value = value || Field(0);
-          const c = Field((2n ** this.sizeInBits()) ** BigInt(i));
+          const c = Field((2n ** this.sizeInBits()) ** BigInt(j));
           f = f.add(value.mul(c));
         }
         fields.push(f);
@@ -189,7 +189,8 @@ export function MultiPackingPlant<
      * @returns Array of bigints, which can be decoded by the implementing class into the final type
      */
     static unpackToBigints(fields: Array<Field>): Array<bigint> {
-      let uints_ = new Array(l);
+      const q = this.elementsPerField();
+      let uints_ = new Array(q * this.n); // array length is number of elements per field * number of fields
       uints_.fill(0n);
       let packedNs = new Array(this.n);
       packedNs.fill(0n);
