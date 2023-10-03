@@ -2,32 +2,17 @@
 
 Make the most of your ZKApp state!
 
-## What is it
-
 O1JS Pack is a library for [O1JS](https://github.com/o1-labs/o1js/) that allows a zkapp developer to pack extra data into a single Field.
 
-### Usage in a ZKApp
+## Examples
 
-```
-import {
-  PackedBoolFactory,
-  PackedStringFactory,
-  PackedUInt32Factory,
-} from 'o1js-pack';
+TODO
 
-const MyPackedBools = PackedBoolFactory(); // Max of 254 Bools
-const MyPackedString = PackedStringFactory(); // Max of 120 Characters
-const MyPackedUInts = PackedUInt32Factory(); // Max of 7 UInt32s
+### Smart Contract
 
-const sevenUints = [1, 2, 3, 4, 5, 6, 7].map(x => UInt32.from(x));
-const myPackedUInts = new MyPackedUInts(MyPackedUInts.pack(sevenUints), sevenUints);
-```
+### ZK Program
 
-## What's the catch?
-
-If a zkapp has two or more independent Fields of state, then preconditions can be set on just one, or on any combination of the Fields. With SnarkyPack, one precondition will be set on the packed Field, which means that independent updates cannot happen asynchronously.
-
-For example, let's say there is a voting app with two independent Fields of state: `yesCount` and `noCount`. If one user issues an update to `yesCount` and another user issues an update to `noCount` at the same time, both proofs may be valid at the same time. Both transactions may succeed during the same block, since they don't interfere with each others' preconditions. With SnarkyPack, a devolper can save state by putting both `yesCount` and `noCount` into the same Field of state, making room for other state to exist on chain. The tradeoff is that two votes will no longer be able to be cast independently. `yesCount` and `noCount` depend on the same precontition, meaning that to update one or the other, you must lock both.
+## How to Extend Packing Plant with Custom Types
 
 ## How to build
 
@@ -39,13 +24,7 @@ npm run build
 
 ```sh
 npm run test src # non-proof tests
-npm run testw # watch mode
-```
-
-## How to run coverage
-
-```sh
-npm run coverage
+npm run test tests/provable # provable tests
 ```
 
 ## Credits
