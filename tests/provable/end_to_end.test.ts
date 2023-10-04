@@ -56,12 +56,10 @@ describe('End to End Text Input Test', () => {
       const p1 = await TextInputProgram.changeFirstLetter(
         proofTextInput,
         initProof,
-        TextInput.unpack(new TextInput(initProof.publicInput.packed).packed),
+        TextInput.unpack(initProof.publicInput.packed),
         Character.fromString('Z')
       );
-      Poseidon.hash(proofTextInput.packed).assertEquals(
-        Poseidon.hash(p1.publicInput.packed)
-      );
+      proofTextInput.assertEquals(p1.publicInput);
     });
   });
 });

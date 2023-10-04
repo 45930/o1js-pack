@@ -1,12 +1,86 @@
-import { Field, Provable, Character } from 'o1js';
-import { MultiPackingPlant } from '../PackingPlant.js';
+import { Field, Provable, Character, Poseidon } from 'o1js';
+import { PackingPlant, MultiPackingPlant } from '../PackingPlant.js';
 
 const SIZE_IN_BITS = 16n;
 const L = 15; // Default to one-field worth of characters
 const CHARS_PER_FIELD = 15;
 
 export function PackedStringFactory(l: number = L) {
-  class PackedString_ extends MultiPackingPlant(Character, l, SIZE_IN_BITS) {
+  class PackedString_ extends PackingPlant(Character, l, SIZE_IN_BITS) {
+    static extractField(input: Character): Field {
+      return input.value;
+    }
+
+    static sizeInBits(): bigint {
+      return SIZE_IN_BITS;
+    }
+
+    /**
+     *
+     * @param f Field, packed with the information, as returned by #pack
+     * @returns Array of Character
+     */
+    static unpack(f: Field): Character[] {
+      const unpacked = Provable.witness(Provable.Array(Character, l), () => {
+        const unpacked = this.unpackToBigints(f);
+        return unpacked.map((x) =>
+          Character.fromString(String.fromCharCode(Number(x)))
+        );
+      });
+      f.assertEquals(PackedString_.pack(unpacked));
+      return unpacked;
+    }
+
+    /**
+     *
+     * @param characters Array of Character to be packed
+     * @returns Instance of the implementing class
+     */
+    static fromCharacters(input: Array<Character>): PackedString_ {
+      let characters: Array<Character> = new Array(this.l);
+      characters.fill(new Character(Field(0)), 0, this.l);
+      for (let i = 0; i < input.length; i++) {
+        characters[i] = input[i];
+      }
+      const packed = this.pack(characters);
+      return new PackedString_(packed);
+    }
+
+    /**
+     *
+     * @param str string to be packed
+     * @returns Instance of the implementing class
+     */
+    static fromString(str: string): PackedString_ {
+      let characters: Array<Character> = new Array(this.l);
+      characters.fill(new Character(Field(0)), 0, this.l);
+      for (let i = 0; i < str.length; i++) {
+        characters[i] = Character.fromString(str[i]);
+      }
+      return this.fromCharacters(characters);
+    }
+
+    toString() {
+      const nullChar = String.fromCharCode(0);
+      return PackedString_.unpack(this.packed)
+        .filter((c) => c.toString() !== nullChar)
+        .join('');
+    }
+  }
+  return PackedString_;
+}
+
+/**
+ *
+ * @param n number of fields to employ to store the string
+ * @returns MultiPackedString_ class with length of n * CHARS_PER_FIELD
+ */
+export function MultiPackedStringFactory(n = 8) {
+  class MultiPackedString_ extends MultiPackingPlant(
+    Character,
+    n * CHARS_PER_FIELD,
+    SIZE_IN_BITS
+  ) {
     static extractField(input: Character): Field {
       return input.value;
     }
@@ -25,12 +99,18 @@ export function PackedStringFactory(l: number = L) {
      * @returns Array of Character
      */
     static unpack(fields: Field[]): Character[] {
-      const unpacked = Provable.witness(Provable.Array(Character, l), () => {
-        let unpacked = this.unpackToBigints(fields);
-        return unpacked.map((x) =>
-          Character.fromString(String.fromCharCode(Number(x)))
-        );
-      });
+      const unpacked = Provable.witness(
+        Provable.Array(Character, this.l),
+        () => {
+          let unpacked = this.unpackToBigints(fields);
+          return unpacked.map((x) =>
+            Character.fromString(String.fromCharCode(Number(x)))
+          );
+        }
+      );
+      Poseidon.hash(fields).assertEquals(
+        Poseidon.hash(MultiPackedString_.pack(unpacked))
+      );
       return unpacked;
     }
 
@@ -39,9 +119,14 @@ export function PackedStringFactory(l: number = L) {
      * @param characters Array of Character to be packed
      * @returns Instance of the implementing class
      */
-    static fromCharacters(characters: Array<Character>): PackedString_ {
+    static fromCharacters(input: Array<Character>): MultiPackedString_ {
+      let characters: Array<Character> = new Array(this.l);
+      characters.fill(new Character(Field(0)), 0, this.l);
+      for (let i = 0; i < input.length; i++) {
+        characters[i] = input[i];
+      }
       const packed = this.pack(characters);
-      return new PackedString_(packed);
+      return new MultiPackedString_(packed);
     }
 
     /**
@@ -49,9 +134,9 @@ export function PackedStringFactory(l: number = L) {
      * @param str string to be packed
      * @returns Instance of the implementing class
      */
-    static fromString(str: string): PackedString_ {
-      let characters: Array<Character> = new Array(l);
-      characters.fill(new Character(Field(0)), 0, l);
+    static fromString(str: string): MultiPackedString_ {
+      let characters: Array<Character> = new Array(this.l);
+      characters.fill(new Character(Field(0)), 0, this.l);
       for (let i = 0; i < str.length; i++) {
         characters[i] = Character.fromString(str[i]);
       }
@@ -60,10 +145,10 @@ export function PackedStringFactory(l: number = L) {
 
     toString() {
       const nullChar = String.fromCharCode(0);
-      return PackedString_.unpack(this.packed)
+      return MultiPackedString_.unpack(this.packed)
         .filter((c) => c.toString() !== nullChar)
         .join('');
     }
   }
-  return PackedString_;
+  return MultiPackedString_;
 }

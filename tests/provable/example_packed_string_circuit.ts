@@ -6,10 +6,9 @@ import {
   Provable,
   Field,
 } from 'o1js';
-import { PackedStringFactory } from '../../src/lib/packed-types/PackedString';
+import { MultiPackedStringFactory } from '../../src/lib/packed-types/PackedString';
 
-const MAX_LENGTH = 32;
-export class TextInput extends PackedStringFactory(MAX_LENGTH) {}
+export class TextInput extends MultiPackedStringFactory(3) {}
 
 export const TextInputProgram = Experimental.ZkProgram({
   publicInput: TextInput,
@@ -23,11 +22,7 @@ export const TextInputProgram = Experimental.ZkProgram({
       },
     },
     changeFirstLetter: {
-      privateInputs: [
-        SelfProof,
-        Provable.Array(Character, MAX_LENGTH),
-        Character,
-      ],
+      privateInputs: [SelfProof, Provable.Array(Character, 45), Character],
       method(
         newState: TextInput,
         oldProof: SelfProof<TextInput, TextInput>,
