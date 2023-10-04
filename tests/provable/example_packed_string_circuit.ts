@@ -6,10 +6,10 @@ import {
   Provable,
   Field,
 } from 'o1js';
-import { PackedStringFactory } from '../../src/lib/packed-types/PackedString';
+import { MultiPackedStringFactory } from '../../src/lib/packed-types/PackedString';
 
 const MAX_LENGTH = 32;
-export class TextInput extends PackedStringFactory(MAX_LENGTH) {}
+export class TextInput extends MultiPackedStringFactory(MAX_LENGTH) {}
 
 export const TextInputProgram = Experimental.ZkProgram({
   publicInput: TextInput,
