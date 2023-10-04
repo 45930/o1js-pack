@@ -4,7 +4,7 @@ import { PackedStringFactory, MultiPackedStringFactory } from './PackedString';
 describe('PackedString', () => {
   describe('Outside of the Circuit', () => {
     const vitalik_dot_eth = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
-    class EthAddressString extends MultiPackedStringFactory(42) {}
+    class EthAddressString extends MultiPackedStringFactory(3) {}
     let characters: Array<Character> = [];
 
     beforeEach(() => {
@@ -31,9 +31,9 @@ describe('PackedString', () => {
       const packed = EthAddressString.pack(unpacked);
 
       expect(packed.length).toBe(Math.ceil(vitalik_dot_eth.length / 15));
-      expect(unpacked.length).toBe(EthAddressString.totalLength());
+      expect(unpacked.length).toBe(EthAddressString.l);
       expect(unpacked.length).toBe(45);
-      expect(unpacked.slice(0, EthAddressString.l).toString()).toBe(
+      expect(unpacked.slice(0, characters.length).toString()).toBe(
         characters.toString()
       );
     });
@@ -41,8 +41,8 @@ describe('PackedString', () => {
   describe('Provable Properties', () => {
     it('#sizeInFields', () => {
       class one extends PackedStringFactory(15) {}
-      class two extends MultiPackedStringFactory(16) {}
-      class three extends MultiPackedStringFactory(40) {}
+      class two extends MultiPackedStringFactory(2) {}
+      class three extends MultiPackedStringFactory(3) {}
 
       expect(one.sizeInFields()).toBe(1);
       expect(two.sizeInFields()).toBe(2);
@@ -68,7 +68,7 @@ describe('PackedString', () => {
     });
     it('Exceeds maximum size string', () => {
       const tooLong = 'too long!'.repeat(20);
-      class MaxString extends MultiPackedStringFactory(120) {}
+      class MaxString extends MultiPackedStringFactory(8) {}
       expect(() => {
         MaxString.fromString(tooLong);
       }).toThrow();
@@ -76,7 +76,7 @@ describe('PackedString', () => {
   });
   describe('In the circuit', () => {
     const vitalik_dot_eth = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
-    class EthAddressString extends MultiPackedStringFactory(42) {}
+    class EthAddressString extends MultiPackedStringFactory(3) {}
 
     const outsideEthAddress = EthAddressString.fromString(vitalik_dot_eth);
 

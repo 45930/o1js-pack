@@ -70,10 +70,15 @@ export function PackedStringFactory(l: number = L) {
   return PackedString_;
 }
 
-export function MultiPackedStringFactory(l: number) {
+/**
+ *
+ * @param n number of fields to employ to store the string
+ * @returns MultiPackedString_ class with length of n * CHARS_PER_FIELD
+ */
+export function MultiPackedStringFactory(n = 8) {
   class MultiPackedString_ extends MultiPackingPlant(
     Character,
-    l,
+    n * CHARS_PER_FIELD,
     SIZE_IN_BITS
   ) {
     static extractField(input: Character): Field {
@@ -95,7 +100,7 @@ export function MultiPackedStringFactory(l: number) {
      */
     static unpack(fields: Field[]): Character[] {
       const unpacked = Provable.witness(
-        Provable.Array(Character, this.totalLength()),
+        Provable.Array(Character, this.l),
         () => {
           let unpacked = this.unpackToBigints(fields);
           return unpacked.map((x) =>
@@ -115,8 +120,8 @@ export function MultiPackedStringFactory(l: number) {
      * @returns Instance of the implementing class
      */
     static fromCharacters(input: Array<Character>): MultiPackedString_ {
-      let characters: Array<Character> = new Array(this.totalLength());
-      characters.fill(new Character(Field(0)), 0, this.totalLength());
+      let characters: Array<Character> = new Array(this.l);
+      characters.fill(new Character(Field(0)), 0, this.l);
       for (let i = 0; i < input.length; i++) {
         characters[i] = input[i];
       }
@@ -130,8 +135,8 @@ export function MultiPackedStringFactory(l: number) {
      * @returns Instance of the implementing class
      */
     static fromString(str: string): MultiPackedString_ {
-      let characters: Array<Character> = new Array(this.totalLength());
-      characters.fill(new Character(Field(0)), 0, this.totalLength());
+      let characters: Array<Character> = new Array(this.l);
+      characters.fill(new Character(Field(0)), 0, this.l);
       for (let i = 0; i < str.length; i++) {
         characters[i] = Character.fromString(str[i]);
       }
