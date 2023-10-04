@@ -1,10 +1,10 @@
 import { Character, Field, Provable } from 'o1js';
-import { PackedStringFactory } from './PackedString';
+import { PackedStringFactory, MultiPackedStringFactory } from './PackedString';
 
 describe('PackedString', () => {
   describe('Outside of the Circuit', () => {
     const vitalik_dot_eth = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
-    class EthAddressString extends PackedStringFactory(42) {}
+    class EthAddressString extends MultiPackedStringFactory(42) {}
     let characters: Array<Character> = [];
 
     beforeEach(() => {
@@ -25,19 +25,24 @@ describe('PackedString', () => {
     });
 
     it('#pack and #unPack', () => {
-      const packed = EthAddressString.pack(characters);
-      const unpacked = EthAddressString.unpack(packed);
+      const unpacked = EthAddressString.unpack(
+        EthAddressString.fromCharacters(characters).packed
+      );
+      const packed = EthAddressString.pack(unpacked);
 
       expect(packed.length).toBe(Math.ceil(vitalik_dot_eth.length / 15));
-      expect(unpacked.length).toBe(vitalik_dot_eth.length);
-      expect(unpacked.toString()).toBe(characters.toString());
+      expect(unpacked.length).toBe(EthAddressString.totalLength());
+      expect(unpacked.length).toBe(45);
+      expect(unpacked.slice(0, EthAddressString.l).toString()).toBe(
+        characters.toString()
+      );
     });
   });
   describe('Provable Properties', () => {
     it('#sizeInFields', () => {
       class one extends PackedStringFactory(15) {}
-      class two extends PackedStringFactory(16) {}
-      class three extends PackedStringFactory(40) {}
+      class two extends MultiPackedStringFactory(16) {}
+      class three extends MultiPackedStringFactory(40) {}
 
       expect(one.sizeInFields()).toBe(1);
       expect(two.sizeInFields()).toBe(2);
@@ -63,7 +68,7 @@ describe('PackedString', () => {
     });
     it('Exceeds maximum size string', () => {
       const tooLong = 'too long!'.repeat(20);
-      class MaxString extends PackedStringFactory(120) {}
+      class MaxString extends MultiPackedStringFactory(120) {}
       expect(() => {
         MaxString.fromString(tooLong);
       }).toThrow();
@@ -71,7 +76,7 @@ describe('PackedString', () => {
   });
   describe('In the circuit', () => {
     const vitalik_dot_eth = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
-    class EthAddressString extends PackedStringFactory(42) {}
+    class EthAddressString extends MultiPackedStringFactory(42) {}
 
     const outsideEthAddress = EthAddressString.fromString(vitalik_dot_eth);
 

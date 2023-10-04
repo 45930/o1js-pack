@@ -36,7 +36,12 @@ export function PackedStringFactory(l: number = L) {
      * @param characters Array of Character to be packed
      * @returns Instance of the implementing class
      */
-    static fromCharacters(characters: Array<Character>): PackedString_ {
+    static fromCharacters(input: Array<Character>): PackedString_ {
+      let characters: Array<Character> = new Array(this.l);
+      characters.fill(new Character(Field(0)), 0, this.l);
+      for (let i = 0; i < input.length; i++) {
+        characters[i] = input[i];
+      }
       const packed = this.pack(characters);
       return new PackedString_(packed);
     }
@@ -47,7 +52,11 @@ export function PackedStringFactory(l: number = L) {
      * @returns Instance of the implementing class
      */
     static fromString(str: string): PackedString_ {
-      const characters = str.split('').map((x) => Character.fromString(x));
+      let characters: Array<Character> = new Array(this.l);
+      characters.fill(new Character(Field(0)), 0, this.l);
+      for (let i = 0; i < str.length; i++) {
+        characters[i] = Character.fromString(str[i]);
+      }
       return this.fromCharacters(characters);
     }
 
@@ -85,9 +94,8 @@ export function MultiPackedStringFactory(l: number) {
      * @returns Array of Character
      */
     static unpack(fields: Field[]): Character[] {
-      const q = this.elementsPerField();
       const unpacked = Provable.witness(
-        Provable.Array(Character, q * this.n),
+        Provable.Array(Character, this.totalLength()),
         () => {
           let unpacked = this.unpackToBigints(fields);
           return unpacked.map((x) =>
@@ -106,7 +114,12 @@ export function MultiPackedStringFactory(l: number) {
      * @param characters Array of Character to be packed
      * @returns Instance of the implementing class
      */
-    static fromCharacters(characters: Array<Character>): MultiPackedString_ {
+    static fromCharacters(input: Array<Character>): MultiPackedString_ {
+      let characters: Array<Character> = new Array(this.totalLength());
+      characters.fill(new Character(Field(0)), 0, this.totalLength());
+      for (let i = 0; i < input.length; i++) {
+        characters[i] = input[i];
+      }
       const packed = this.pack(characters);
       return new MultiPackedString_(packed);
     }
@@ -117,9 +130,8 @@ export function MultiPackedStringFactory(l: number) {
      * @returns Instance of the implementing class
      */
     static fromString(str: string): MultiPackedString_ {
-      const q = this.elementsPerField();
-      let characters: Array<Character> = new Array(q * this.n);
-      characters.fill(new Character(Field(0)), 0, q * this.n);
+      let characters: Array<Character> = new Array(this.totalLength());
+      characters.fill(new Character(Field(0)), 0, this.totalLength());
       for (let i = 0; i < str.length; i++) {
         characters[i] = Character.fromString(str[i]);
       }

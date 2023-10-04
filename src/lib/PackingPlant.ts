@@ -142,8 +142,7 @@ export function MultiPackingPlant<
      * @throws if the length of the array is longer than the length of the implementing factory config
      */
     static checkPack(unpacked: Array<T>) {
-      const q = this.elementsPerField();
-      if (unpacked.length > q * this.n) {
+      if (unpacked.length > this.totalLength()) {
         throw new Error(
           `Input of size ${unpacked.length} is larger than expected size of ${l}`
         );
@@ -189,8 +188,7 @@ export function MultiPackingPlant<
      * @returns Array of bigints, which can be decoded by the implementing class into the final type
      */
     static unpackToBigints(fields: Array<Field>): Array<bigint> {
-      const q = this.elementsPerField();
-      let uints_ = new Array(q * this.n); // array length is number of elements per field * number of fields
+      let uints_ = new Array(this.totalLength()); // array length is number of elements per field * number of fields
       uints_.fill(0n);
       let packedNs = new Array(this.n);
       packedNs.fill(0n);
@@ -216,6 +214,15 @@ export function MultiPackingPlant<
         }
       }
       return uints_;
+    }
+
+    /**
+     * total length of the unpacked data, including dummy values packed at the end
+     * differs from static l in that l is the length of the useful input data, ignoring dummy values
+     * @returns number of elements in the raw unpacked data
+     */
+    static totalLength(): number {
+      return this.elementsPerField() * this.n;
     }
 
     assertEquals(other: Packed_) {
