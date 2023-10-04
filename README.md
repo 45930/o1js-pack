@@ -8,11 +8,17 @@ o1js Pack is a library for [o1js](https://github.com/o1-labs/o1js/) that allows 
 
 ### Usage in a zkApp
 
-TODO
-
 ### Smart Contract
 
+The primary benefit of using this library in a smart contract is that it allows you to use more of your allotted 8 Fields of storage.
+
+Code Examples TODO
+
 ### ZK Program
+
+The benefit to using this library in a zk program is less obvious. In some cases, the number of gates required in a circuit is less using this library than with provable arrays. Especially in applications where the array is hashed many times, packing and unpacking ends up being more effecient than doing a lot of Poseidon hashes. In other cases, you may just prefer the API of o1js Pack compared to using provable arrays.
+
+Code Examples TODO
 
 ## How to build
 
