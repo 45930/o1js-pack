@@ -1,18 +1,18 @@
-# O1JS Pack
+# o1js Pack
 
-Make the most of your ZKApp state!
+Make the most of your zkApp state!
 
-O1JS Pack is a library for [O1JS](https://github.com/o1-labs/o1js/) that allows a zkapp developer to pack extra data into a single Field.
+## What is it
 
-## Examples
+o1js Pack is a library for [o1js](https://github.com/o1-labs/o1js/) that allows a zkApp developer to pack extra data into a single Field.
+
+### Usage in a zkApp
 
 TODO
 
 ### Smart Contract
 
 ### ZK Program
-
-## How to Extend Packing Plant with Custom Types
 
 ## How to build
 
@@ -29,7 +29,7 @@ npm run test tests/provable # provable tests
 
 ## Credits
 
-Thanks to @mario_zito for seeding the idea for this library on discord ([Thread 1](https://discord.com/channels/484437221055922177/1128509274465779822), [Thread 2](https://discord.com/channels/484437221055922177/1128501705173106698)), and to @gregor for sounding out the early implementation.
+Thanks to @mario_zito for seeding the idea for this library on Discord ([Thread 1](https://discord.com/channels/484437221055922177/1128509274465779822), [Thread 2](https://discord.com/channels/484437221055922177/1128501705173106698)), and to @gregor for sounding out the early implementation.
 
 Thanks to @iam-dev for early adoption!
 
