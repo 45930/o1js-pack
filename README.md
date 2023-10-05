@@ -12,13 +12,13 @@ o1js Pack is a library for [o1js](https://github.com/o1-labs/o1js/) that allows 
 
 The primary benefit of using this library in a smart contract is that it allows you to use more of your allotted 8 Fields of storage.
 
-Code Examples TODO
+Check out example usage in a zk program in [Zk Program Examples](/examples/smart_contract/)
 
 ### ZK Program
 
 The benefit to using this library in a zk program is less obvious. In some cases, the number of gates required in a circuit is less using this library than with provable arrays. Especially in applications where the array is hashed many times, packing and unpacking ends up being more effecient than doing a lot of Poseidon hashes. In other cases, you may just prefer the API of o1js Pack compared to using provable arrays.
 
-Code Examples TODO
+Check out example usage in a zk program in [Zk Program Examples](/examples/zk_program/)
 
 ## How to build
 
