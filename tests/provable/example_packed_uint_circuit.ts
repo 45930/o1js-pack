@@ -1,9 +1,10 @@
-import { Experimental, SelfProof } from 'o1js';
+import { ZkProgram, SelfProof } from 'o1js';
 import { PackedUInt32Factory } from '../../src/lib/packed-types/PackedUInt32';
 
 export class Votes extends PackedUInt32Factory() {}
 
-export const VotesProgram = Experimental.ZkProgram({
+export const VotesProgram = ZkProgram({
+  name: 'VotesProgram',
   publicInput: Votes,
 
   methods: {
@@ -35,5 +36,5 @@ export const VotesProgram = Experimental.ZkProgram({
   },
 });
 
-export let VotesProof_ = Experimental.ZkProgram.Proof(VotesProgram);
+export let VotesProof_ = ZkProgram.Proof(VotesProgram);
 export class VotesProof extends VotesProof_ {}

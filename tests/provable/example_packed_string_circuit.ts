@@ -1,5 +1,5 @@
 import {
-  Experimental,
+  ZkProgram,
   SelfProof,
   Character,
   Poseidon,
@@ -10,7 +10,8 @@ import { MultiPackedStringFactory } from '../../src/lib/packed-types/PackedStrin
 
 export class TextInput extends MultiPackedStringFactory(3) {}
 
-export const TextInputProgram = Experimental.ZkProgram({
+export const TextInputProgram = ZkProgram({
+  name: 'TextInputProgram',
   publicInput: TextInput,
 
   methods: {
@@ -43,5 +44,5 @@ export const TextInputProgram = Experimental.ZkProgram({
   },
 });
 
-export let TextInputProof_ = Experimental.ZkProgram.Proof(TextInputProgram);
+export let TextInputProof_ = ZkProgram.Proof(TextInputProgram);
 export class TextInputProof extends TextInputProof_ {}
