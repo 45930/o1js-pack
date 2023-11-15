@@ -40,11 +40,9 @@
     "husky": "^7.0.1",
     "jest": "^27.3.1",
     "lint-staged": "^11.0.1",
+    "o1js": "^0.14.*",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.7",
     "typescript": "^4.7.2"
-  },
-  "peerDependencies": {
-    "o1js": "^0.13.*"
   }
 }
