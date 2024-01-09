@@ -1,9 +1,9 @@
 import { Field, Provable, Character, Poseidon } from 'o1js';
 import { PackingPlant, MultiPackingPlant } from '../PackingPlant.js';
 
-const SIZE_IN_BITS = 16n;
-const L = 15; // Default to one-field worth of characters
-const CHARS_PER_FIELD = 15;
+const SIZE_IN_BITS = 8n;
+const L = 31; // Default to one-field worth of characters
+const CHARS_PER_FIELD = 31;
 
 export function PackedStringFactory(l: number = L) {
   class PackedString_ extends PackingPlant(Character, l, SIZE_IN_BITS) {

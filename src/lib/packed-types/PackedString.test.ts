@@ -4,7 +4,7 @@ import { PackedStringFactory, MultiPackedStringFactory } from './PackedString';
 describe('PackedString', () => {
   describe('Outside of the Circuit', () => {
     const vitalik_dot_eth = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
-    class EthAddressString extends MultiPackedStringFactory(3) {}
+    class EthAddressString extends MultiPackedStringFactory(2) {}
     let characters: Array<Character> = [];
 
     beforeEach(() => {
@@ -30,17 +30,48 @@ describe('PackedString', () => {
       );
       const packed = EthAddressString.pack(unpacked);
 
-      expect(packed.length).toBe(Math.ceil(vitalik_dot_eth.length / 15));
+      expect(packed.length).toBe(Math.ceil(vitalik_dot_eth.length / 31));
       expect(unpacked.length).toBe(EthAddressString.l);
-      expect(unpacked.length).toBe(45);
+      expect(unpacked.length).toBe(62);
       expect(unpacked.slice(0, characters.length).toString()).toBe(
         characters.toString()
       );
     });
+
+    it('#toFields', () => {
+      class Single extends PackedStringFactory() {}
+      class Double extends MultiPackedStringFactory(2) {}
+      const abbaPacked = '1633837665';
+
+      expect(Single.fromString('abba').toFields().toString()).toBe(
+        [Single.fromString('abba').packed].toString()
+      );
+      expect(Single.fromString('abba').toFields().toString()).toBe(abbaPacked);
+      expect(
+        Single.unpack(Field(abbaPacked)).slice(0, 4).join('').toString()
+      ).toBe('abba');
+
+      const abbaAlot = 'abba'.repeat(10);
+      const abbaAlotPacked1 =
+        '173830008860859097861870638220020642754739197069143560335286125952244015713';
+      const abbaAlotPacked2 = '1796423510984151425377';
+      expect(Double.fromString(abbaAlot).toFields().toString()).toBe(
+        [Double.fromString(abbaAlot).packed].toString()
+      );
+      expect(Double.fromString(abbaAlot).toFields().toString()).toBe(
+        abbaAlotPacked1 + ',' + abbaAlotPacked2
+      );
+      expect(
+        Double.unpack([Field(abbaAlotPacked1), Field(abbaAlotPacked2)])
+          .slice(0, 40)
+          .join('')
+          .toString()
+      ).toBe(abbaAlot);
+    });
   });
   describe('Provable Properties', () => {
     it('#sizeInFields', () => {
-      class one extends PackedStringFactory(15) {}
+      class one extends PackedStringFactory(31) {}
       class two extends MultiPackedStringFactory(2) {}
       class three extends MultiPackedStringFactory(3) {}
 
@@ -67,7 +98,7 @@ describe('PackedString', () => {
       }).toThrow();
     });
     it('Exceeds maximum size string', () => {
-      const tooLong = 'too long!'.repeat(20);
+      const tooLong = 'too long!'.repeat(50);
       class MaxString extends MultiPackedStringFactory(8) {}
       expect(() => {
         MaxString.fromString(tooLong);
