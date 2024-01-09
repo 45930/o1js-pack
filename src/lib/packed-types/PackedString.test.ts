@@ -38,36 +38,36 @@ describe('PackedString', () => {
       );
     });
 
-    // it.skip('#toFields', () => {
-    //   class Single extends PackedStringFactory() {}
-    //   class Double extends MultiPackedStringFactory(2) {}
-    //   const abbaPacked = '1633837665';
+    it('#toFields', () => {
+      class Single extends PackedStringFactory() {}
+      class Double extends MultiPackedStringFactory(2) {}
+      const abbaPacked = '1633837665';
 
-    //   expect(Single.fromString('abba').toFields().toString()).toBe(
-    //     [Single.fromString('abba').packed].toString()
-    //   );
-    //   expect(Single.fromString('abba').toFields().toString()).toBe(abbaPacked);
-    //   expect(
-    //     Single.unpack(Field(abbaPacked)).slice(0, 4).join('').toString()
-    //   ).toBe('abba');
+      expect(Single.fromString('abba').toFields().toString()).toBe(
+        [Single.fromString('abba').packed].toString()
+      );
+      expect(Single.fromString('abba').toFields().toString()).toBe(abbaPacked);
+      expect(
+        Single.unpack(Field(abbaPacked)).slice(0, 4).join('').toString()
+      ).toBe('abba');
 
-    //   const abbaAlot = 'abba'.repeat(10);
-    //   const abbaAlotPacked1 =
-    //     '173830008860859097861870638220020642754739197069143560335286125952244015713';
-    //   const abbaAlotPacked2 = '1796423510984151425377';
-    //   expect(Double.fromString(abbaAlot).toFields().toString()).toBe(
-    //     [Double.fromString(abbaAlot).packed].toString()
-    //   );
-    //   expect(Double.fromString(abbaAlot).toFields().toString()).toBe(
-    //     abbaAlotPacked1 + ',' + abbaAlotPacked2
-    //   );
-    //   expect(
-    //     Double.unpack([Field(abbaAlotPacked1), Field(abbaAlotPacked2)])
-    //       .slice(0, 40)
-    //       .join('')
-    //       .toString()
-    //   ).toBe(abbaAlot);
-    // });
+      const abbaAlot = 'abba'.repeat(10);
+      const abbaAlotPacked1 =
+        '173830008860859097861870638220020642754739197069143560335286125952244015713';
+      const abbaAlotPacked2 = '1796423510984151425377';
+      expect(Double.fromString(abbaAlot).toFields().toString()).toBe(
+        [Double.fromString(abbaAlot).packed].toString()
+      );
+      expect(Double.fromString(abbaAlot).toFields().toString()).toBe(
+        abbaAlotPacked1 + ',' + abbaAlotPacked2
+      );
+      expect(
+        Double.unpack([Field(abbaAlotPacked1), Field(abbaAlotPacked2)])
+          .slice(0, 40)
+          .join('')
+          .toString()
+      ).toBe(abbaAlot);
+    });
   });
   describe('Provable Properties', () => {
     it('#sizeInFields', () => {

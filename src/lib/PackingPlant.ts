@@ -93,12 +93,12 @@ export function PackingPlant<A, T extends InferProvable<A> = InferProvable<A>>(
     }
 
     // NOTE: adding to fields here breaks the proof generation.  Probably not overriding it correctly
-    // /**
-    //  * @returns array of single Field element which constitute the packed object
-    //  */
-    // toFields(): Array<Field> {
-    //   return [this.packed];
-    // }
+    /**
+     * @returns array of single Field element which constitute the packed object
+     */
+    toFields(): Array<Field> {
+      return [this.packed];
+    }
 
     assertEquals(other: Packed_) {
       this.packed.assertEquals(other.packed);
@@ -225,12 +225,12 @@ export function MultiPackingPlant<
     }
 
     // NOTE: adding to fields here breaks the proof generation.  Probably not overriding it correctly
-    // /**
-    //  * @returns array of Field elements which constitute the multi-packed object
-    //  */
-    // toFields(): Array<Field> {
-    //   return this.packed;
-    // }
+    /**
+     * @returns array of Field elements which constitute the multi-packed object
+     */
+    toFields(): Array<Field> {
+      return this.packed;
+    }
 
     assertEquals(other: Packed_) {
       for (let x = 0; x < n; x++) {
