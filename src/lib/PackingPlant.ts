@@ -5,6 +5,7 @@ import {
   provable,
   InferProvable,
   Provable,
+  ProvableExtended,
 } from 'o1js';
 
 const MAX_BITS_PER_FIELD = 254n;
