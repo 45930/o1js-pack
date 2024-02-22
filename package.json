@@ -1,6 +1,6 @@
 {
   "name": "o1js-pack",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "",
   "author": "45930",
   "license": "Apache-2.0",
@@ -45,6 +45,6 @@
     "typescript": "^4.7.2"
   },
   "peerDependencies": {
-    "o1js": "0.16.1"
+    "o1js": "^0.16.2"
   }
 }
