@@ -1,11 +1,9 @@
 import {
   Field,
-  Experimental,
+  ZkProgram,
   UInt32,
   Provable,
-  Poseidon,
   SelfProof,
-  Character,
   Bool,
   Empty,
 } from 'o1js';
@@ -34,19 +32,20 @@ const isOlderThan = (reference: PackedString, toVerify: PackedString): Bool => {
   return ver.greaterThan(ref);
 };
 
-export const AgeGateCircuit = Experimental.ZkProgram({
+export const AgeGateCircuit = ZkProgram({
+  name: 'AgeGateCircuit',
   publicOutput: PackedCounters,
 
   methods: {
     init: {
       privateInputs: [],
-      method() {
+      async method() {
         return PackedCounters.fromBigInts([0n, 0n]);
       },
     },
     verifyAge: {
       privateInputs: [SelfProof, PackedString],
-      method(
+      async method(
         oldProof: SelfProof<Empty, PackedCounters>,
         dateToVerify: PackedString
       ) {
@@ -72,4 +71,4 @@ export const AgeGateCircuit = Experimental.ZkProgram({
   },
 });
 
-export const AgeGateCircuitProof = Experimental.ZkProgram.Proof(AgeGateCircuit);
+export const AgeGateCircuitProof = ZkProgram.Proof(AgeGateCircuit);

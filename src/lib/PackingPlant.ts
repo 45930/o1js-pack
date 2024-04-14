@@ -1,12 +1,4 @@
-import {
-  Field,
-  Struct,
-  Poseidon,
-  provable,
-  InferProvable,
-  Provable,
-  ProvableExtended,
-} from 'o1js';
+import { Field, Struct, provable, InferProvable, Provable } from 'o1js';
 
 const MAX_BITS_PER_FIELD = 254n;
 

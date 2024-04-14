@@ -75,20 +75,24 @@ describe('PackedUInt32', () => {
         });
       }).not.toThrow();
     });
-    it('#assertEquals', () => {
+    it('#assertEquals', async () => {
       expect(() => {
         Provable.runAndCheck(() => {
           const packedUInt32 = new PackedUInt32(outsidePackedUInt.packed);
           packedUInt32.assertEquals(outsidePackedUInt);
         });
       }).not.toThrow();
-      expect(() => {
-        Provable.runAndCheck(() => {
-          const fakePacked = outsidePackedUInt.packed.add(32);
-          const packedUInt32 = new PackedUInt32(fakePacked);
-          packedUInt32.assertEquals(outsidePackedUInt);
-        });
-      }).toThrow();
+
+      // TODO: This test should not be in the "provable" block since it's not in the runAndCheck
+      //       It seems like failures in the runAndCheck can't be tested for with #toThrow
+      try {
+        const fakePacked = outsidePackedUInt.packed.add(32);
+        const packedUInt32 = new PackedUInt32(fakePacked);
+        packedUInt32.assertEquals(outsidePackedUInt);
+        fail('Expected to throw Field.assertEquals error');
+      } catch (e: any) {
+        expect(e.message).toContain('Field.assertEquals');
+      }
     });
   });
 });

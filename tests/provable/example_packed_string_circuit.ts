@@ -1,11 +1,4 @@
-import {
-  ZkProgram,
-  SelfProof,
-  Character,
-  Poseidon,
-  Provable,
-  Field,
-} from 'o1js';
+import { ZkProgram, SelfProof, Character, Provable } from 'o1js';
 import { PackedStringFactory } from '../../src/lib/packed-types/PackedString';
 
 export class TextInput extends PackedStringFactory() {}
@@ -17,14 +10,14 @@ export const TextInputProgram = ZkProgram({
   methods: {
     init: {
       privateInputs: [],
-      method(state: TextInput) {
+      async method(state: TextInput) {
         const initState = TextInput.fromString('Mina Protocol');
         state.assertEquals(initState);
       },
     },
     changeFirstLetter: {
       privateInputs: [SelfProof, Provable.Array(Character, 31), Character],
-      method(
+      async method(
         newState: TextInput,
         oldProof: SelfProof<TextInput, TextInput>,
         oldCharacters: Array<Character>,
