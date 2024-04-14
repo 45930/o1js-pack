@@ -9,7 +9,7 @@ export class Election extends SmartContract {
   @state(Ballot) ballot3 = State<Ballot>();
   @state(Ballot) ballot4 = State<Ballot>();
 
-  init() {
+  async init() {
     super.init();
     this.ballot1.set(Ballot.fromBigInts([0n, 0n, 0n, 0n, 0n, 0n, 0n]));
     this.ballot2.set(Ballot.fromBigInts([0n, 0n, 0n, 0n, 0n, 0n, 0n]));
@@ -18,9 +18,9 @@ export class Election extends SmartContract {
   }
 
   @method
-  castBallot1(vote: Ballot) {
+  async castBallot1(vote: Ballot) {
     const unpackedVote = Ballot.unpack(vote.packed);
-    const ballot1 = this.ballot1.getAndAssertEquals();
+    const ballot1 = this.ballot1.getAndRequireEquals();
     const unpackedBallot1 = Ballot.unpack(ballot1.packed);
 
     let voteSum = UInt32.from(0);
@@ -33,9 +33,9 @@ export class Election extends SmartContract {
   }
 
   @method
-  castBallot2(vote: Ballot) {
+  async castBallot2(vote: Ballot) {
     const unpackedVote = Ballot.unpack(vote.packed);
-    const ballot2 = this.ballot2.getAndAssertEquals();
+    const ballot2 = this.ballot2.getAndRequireEquals();
     const unpackedBallot2 = Ballot.unpack(ballot2.packed);
 
     let voteSum = UInt32.from(0);
@@ -50,7 +50,7 @@ export class Election extends SmartContract {
   @method
   castBallot3(vote: Ballot) {
     const unpackedVote = Ballot.unpack(vote.packed);
-    const ballot3 = this.ballot3.getAndAssertEquals();
+    const ballot3 = this.ballot3.getAndRequireEquals();
     const unpackedBallot3 = Ballot.unpack(ballot3.packed);
 
     let voteSum = UInt32.from(0);
@@ -63,9 +63,9 @@ export class Election extends SmartContract {
   }
 
   @method
-  castBallot4(vote: Ballot) {
+  async castBallot4(vote: Ballot) {
     const unpackedVote = Ballot.unpack(vote.packed);
-    const ballot4 = this.ballot4.getAndAssertEquals();
+    const ballot4 = this.ballot4.getAndRequireEquals();
     const unpackedBallot4 = Ballot.unpack(ballot4.packed);
 
     let voteSum = UInt32.from(0);

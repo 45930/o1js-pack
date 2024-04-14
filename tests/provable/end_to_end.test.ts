@@ -4,7 +4,7 @@ import {
   TextInputProgram,
   TextInputProof,
 } from './example_packed_string_circuit';
-import { Character, Poseidon } from 'o1js';
+import { Character } from 'o1js';
 
 describe('End to End Votes Test', () => {
   const init = [0n, 0n];

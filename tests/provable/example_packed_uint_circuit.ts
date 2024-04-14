@@ -10,14 +10,14 @@ export const VotesProgram = ZkProgram({
   methods: {
     init: {
       privateInputs: [],
-      method(state: Votes) {
+      async method(publicInput: Votes) {
         const initState = Votes.fromBigInts([0n, 0n]);
-        state.assertEquals(initState);
+        publicInput.assertEquals(initState);
       },
     },
     incrementIndex0: {
       privateInputs: [SelfProof],
-      method(newState: Votes, oldProof: SelfProof<Votes, Votes>) {
+      async method(newState: Votes, oldProof: SelfProof<Votes, Votes>) {
         oldProof.verify();
         const unpacked = Votes.unpack(oldProof.publicInput.packed);
         unpacked[0] = unpacked[0].add(1);
@@ -26,7 +26,7 @@ export const VotesProgram = ZkProgram({
     },
     incrementIndex1: {
       privateInputs: [SelfProof],
-      method(newState: Votes, oldProof: SelfProof<Votes, Votes>) {
+      async method(newState: Votes, oldProof: SelfProof<Votes, Votes>) {
         oldProof.verify();
         const unpacked = Votes.unpack(oldProof.publicInput.packed);
         unpacked[1] = unpacked[1].add(1);
