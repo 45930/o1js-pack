@@ -130,15 +130,17 @@ describe('PackedString', () => {
         });
       }).not.toThrow();
 
-      expect(() => {
-        Provable.runAndCheck(() => {
-          const fakePacked = [...outsideEthAddress.packed];
-          fakePacked[0] = fakePacked[0].add(1);
-          const myEthAddress = new EthAddressString(fakePacked);
-
-          myEthAddress.assertEquals(outsideEthAddress);
-        });
-      }).toThrow();
+      // TODO: This test should not be in the "provable" block since it's not in the runAndCheck
+      //       It seems like failures in the runAndCheck can't be tested for with #toThrow
+      try {
+        const fakePacked = [...outsideEthAddress.packed];
+        fakePacked[0] = fakePacked[0].add(1);
+        const myEthAddress = new EthAddressString(fakePacked);
+        myEthAddress.assertEquals(outsideEthAddress);
+        fail('Expected to throw Field.assertEquals error');
+      } catch (e: any) {
+        expect(e.message).toContain('Field.assertEquals');
+      }
     });
   });
 });
