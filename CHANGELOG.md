@@ -1,3 +1,8 @@
+## v0.6
+
+- Upgrading to o1js version 0.18.0
+- Updated tests and examples to use async circuits
+
 ## v0.5
 
 - Making PackedString class 31 characters instead of 15
