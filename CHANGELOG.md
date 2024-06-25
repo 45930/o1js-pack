@@ -1,3 +1,7 @@
+## v0.7
+
+- Upgrage o1js to version 1.3.1
+
 ## v0.6
 
 - Upgrading to o1js version 0.18.0
