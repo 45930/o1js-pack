@@ -1,6 +1,6 @@
 {
   "name": "o1js-pack",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "",
   "author": "45930",
   "license": "Apache-2.0",
@@ -45,7 +45,7 @@
     "typescript": "^5.5.2"
   },
   "peerDependencies": {
-    "o1js": "^1.0.0"
+    "o1js": "^2.0.0"
   },
   "volta": {
     "node": "20.15.0"
